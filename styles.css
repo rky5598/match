@@ -1,0 +1,33 @@
+
+:root{--bg:#12141a;--card:#1c1f28;--ink:#e8eaf0;--mut:#9aa0ae;--acc:#7db4ff;--ok:#7fd99a;--warn:#f0c674;--bad:#f28b82;--line:#2a2f3c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Georgia,'Times New Roman',serif}
+.wrap{max-width:760px;margin:0 auto;padding:24px 16px 64px}
+h1{font-size:1.5rem;margin:.2em 0} h2{font-size:1.15rem;margin:1.2em 0 .4em}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin:14px 0}
+.mut{color:var(--mut)} .small{font-size:.85rem}
+button{background:var(--acc);color:#0b1220;border:0;border-radius:10px;padding:10px 18px;font-size:1rem;cursor:pointer;font-weight:600}
+button.ghost{background:transparent;color:var(--acc);border:1px solid var(--acc)}
+button:disabled{opacity:.4;cursor:default}
+input[type=range]{width:100%;accent-color:var(--acc)}
+select,checkbox{accent-color:var(--acc)}
+.screen{display:none}.screen.active{display:block}
+.vecrow{display:grid;grid-template-columns:110px 1fr 46px;gap:10px;align-items:center;margin:8px 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);border-radius:999px;padding:4px 12px;cursor:pointer;user-select:none}
+.chip.on{background:var(--acc);color:#0b1220;font-weight:600}
+.chip.on.d2{background:var(--bad)}
+.linkbox{word-break:break-all;background:#0d1016;border:1px solid var(--line);border-radius:10px;padding:10px;font-family:monospace;font-size:.8rem}
+.pct{font-size:3rem;font-weight:700}
+.bar{height:10px;background:#0d1016;border-radius:6px;overflow:hidden;margin:4px 0 10px}
+.bar>i{display:block;height:100%;background:var(--acc)}
+.flag{color:var(--bad)} .good{color:var(--ok)} .warn{color:var(--warn)}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:10px 0}
+summary{cursor:pointer;color:var(--acc)}
+table{width:100%;border-collapse:collapse;font-size:.9rem}
+td,th{padding:6px 8px;border-bottom:1px solid var(--line);text-align:left}
+.banner{border:1px solid var(--line);border-radius:10px;padding:8px 14px;margin:10px 0;font-size:.85rem}
+.banner.ok{border-color:var(--ok);color:var(--ok)}
+.banner.bad{border-color:var(--bad);color:var(--bad)}
+details p{margin:.4em 0}
+details li{margin:.35em 0}
