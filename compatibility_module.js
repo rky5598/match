@@ -1,123 +1,214 @@
-/* ============================================================
-   SVP Compatibility Engine v2.1 — откалиброванный движок
-   Законы: 13 (двери), 24 (свет/тьма на одном атоме), 16 (цена пика),
-   5 (суррогат), закон застывшего состояния (невроз×невроз).
-   Детерминизм: одинаковые входы -> одинаковый выход. LLM не участвует.
-   ============================================================ */
+/* SVP Match Engine v2.2 — зеркало compatibility_module (эталон: Python) */
+(function (global) {
+  'use strict';
 
-const VECTORS = ['мышечный','кожный','анальный','уретральный','звуковой','зрительный','оральный','обонятельный'];
-const DOORS = [[0,1],[2,3],[4,5],[6,7]]; // мыш-кож, ан-ур, зв-зр, ор-обн
-const NADIS = [
-  ['Ида — время/ритм',[2,3]],
-  ['Пингала — энергия/общение',[6,7]],
-  ['Сушумна — информация/смыслы',[4,5]],
-  ['Тело-среда',[0,1]]
-];
-const FRICTION_PER_PEAK = 10; // закон 16: вершина стоит энергии
-const L3_PER_OVERLAP = 15;    // закон 24: общие света
+  var VECTORS = [
+    ['K','кожный','Ида'], ['A','анальный','Сушумна'], ['U','уретральный','Пингала'],
+    ['M','мышечный','Ида'], ['Z','зрительный','Пингала'], ['S','звуковой','Сушумна'],
+    ['O','оральный','Пингала'], ['Bn','обонятельный','Сушумна']
+  ];
+  var KEYS = VECTORS.map(function (v) { return v[0]; });
+  var VNAME = {}; VECTORS.forEach(function (v) { VNAME[v[0]] = v[1]; });
+  var AXES = { 'Сушумна': ['A','S','Bn'], 'Ида': ['K','M'], 'Пингала': ['U','Z','O'] };
+  var DARK_NAMES = {
+    K: 'контроль, скупость, манипуляции слабыми',
+    A: 'упрямство, счёт обид и долгов',
+    U: 'самодурство, властная истерия',
+    M: 'апатия, лень, телесная спячка',
+    Z: 'страхи, ревность, истерики',
+    S: 'уныние, изоляция, внутренняя пустота',
+    O: 'брань, пошлость, распущенность речи',
+    Bn: 'тревожность, подозрительность, страх'
+  };
+  var LIGHT_NAMES = {
+    K: 'дисциплина, логика, адаптация',
+    A: 'верность, порядок, память рода',
+    U: 'ответственность за всех, поток жизни',
+    M: 'трудолюбие, выносливость, опора',
+    Z: 'любовь, сострадание, эмоциональная глубина',
+    S: 'сосредоточенность, глубина смысла',
+    O: 'веселье, слово, снятие напряжения',
+    Bn: 'чутьё, распознавание людей и ситуаций'
+  };
+  var TYPE_NAMES = {
+    partner: 'Партнёр', friend: 'Друг', business: 'Бизнес',
+    parent_child: 'Родитель → ребёнок', child_parent: 'Ребёнок → родитель'
+  };
 
-const REL = {
-  partner:  {l1:40,l2:40,l3:30, dark:-20, neuro:-45, double:-20, name:'Романтический партнёр'},
-  friend:   {l1:30,l2:30,l3:40, dark:-5,  neuro:-10, double:+10, name:'Друг'},
-  business: {l1:40,l2:40,l3:30, dark:-10, neuro:-20, double:-25, name:'Деловой партнёр'},
-  parent:   {l1:30,l2:40,l3:30, dark:-20, neuro:-35, double:0,   name:'Родитель → ребёнок'},
-  child:    {l1:30,l2:40,l3:30, dark:-5,  neuro:-10, double:0,   name:'Ребёнок → родитель'}
-};
+  /* Конфиги типов отношений (калибровка v2.1 — НЕ менять без перекалибровки корпуса) */
+  var CFG = {
+    partner:      { light: 27.0, doors: 49.0, axes: 5.0,  dl: -20.0, dark: null, neuro: null,  veto: true },
+    friend:       { light: 60.0, doors: 10.0, axes: 30.0, dl: 10.0,  dark: -5.0, neuro: 0.0,   veto: false },
+    business:     { light: 60.0, doors: 34.0, axes: 20.0, dl: -25.0, dark: 0.0,  neuro: 0.0,   veto: false },
+    parent_child: { light: 50.0, doors: 30.0, axes: 20.0, dl: 0.0,   dark: -20.0, neuro: -30.0, veto: false },
+    child_parent: { light: 30.0, doors: 30.0, axes: 20.0, dl: 0.0,   dark: -10.0, neuro: -20.0, veto: false }
+  };
+  var PEAK_FRICTION = 10.5;
 
-function layer1(A,B,cfg){
-  const detail=[]; let pts=0;
-  for(const [a,b] of DOORS){
-    const ma=A.v[a],mb=A.v[b],na=B.v[a],nb=B.v[b];
-    const comp = (ma>=2&&nb>=2)||(na>=2&&mb>=2);
-    const single = (ma>=3&&mb>=3)||(na>=3&&nb>=3);
-    let d=0, why='дверь не открыта';
-    if(comp){d=8; why='истинное дополнение: каждая половина двери — от своего человека';}
-    else if(single){d=3; why='функция есть, но закрыта одним человеком (нет обмена)';}
-    const s=d*cfg.l1/40; pts+=s;
-    detail.push([VECTORS[a]+' ↔ '+VECTORS[b], d, Math.round(s*10)/10, why]);
+  function shortDark(k) { return DARK_NAMES[k].split(',')[0]; }
+
+  function lightMatch(A, B) {
+    var inter = A.light.filter(function (k) { return B.light.indexOf(k) >= 0; });
+    return Math.min(inter.length, 3) / 3.0;
   }
-  return [pts,detail];
-}
-function layer2(A,B,cfg){
-  const detail=[]; let pts=0;
-  for(const [name,idx] of NADIS){
-    const ca=A.v.some((x,i)=>idx.includes(i)&&x>=2);
-    const cb=B.v.some((x,i)=>idx.includes(i)&&x>=2);
-    const d=(ca&&cb)?10:((ca||cb)?2:0);
-    const why=(ca&&cb)?'ось поделена':((ca||cb)?'ось тянет один':'ось пуста');
-    const s=d*cfg.l2/40; pts+=s;
-    detail.push([name,ca,cb,Math.round(s*10)/10,why]);
+
+  function doorsMatch(A, B) {
+    var covered = 0, total = 0, detail = [];
+    KEYS.forEach(function (k) {
+      var dA = A.dark[k] || 0, dB = B.dark[k] || 0;
+      if (dA) total++;
+      if (dB) total++;
+      if (dA && B.levels[k] >= 3) { covered++; detail.push(['get', k]); }
+      if (dB && A.levels[k] >= 3) { covered++; detail.push(['give', k]); }
+    });
+    return { value: total ? covered / total : 0.0, covered: covered, total: total, detail: detail };
   }
-  return [pts,detail];
-}
-function layer3(A,B,cfg){
-  const ov=(A.light||[]).filter(i=>(B.light||[]).includes(i));
-  return [Math.min(ov.length*L3_PER_OVERLAP,cfg.l3), ov.map(i=>VECTORS[i])];
-}
-function friction(A,B){
-  const n=A.v.filter(x=>x>=4).length + B.v.filter(x=>x>=4).length;
-  return FRICTION_PER_PEAK*n;
-}
-function flags(A,B,relType){
-  const cfg=REL[relType]; const out=[]; let pen=0;
-  const da=new Set(Object.keys(A.dark||{})), db=new Set(Object.keys(B.dark||{}));
-  [...da].sort().forEach(v=>{
-    if(!db.has(v)) return;
-    if((A.dark||{})[v]===2 && (B.dark||{})[v]===2){
-      out.push('Невроз×невроз в доме «'+VECTORS[v]+'» — две черты закрепляют друг друга ('+cfg.neuro+')'); pen+=cfg.neuro;
-    } else {
-      out.push('Совпадение тьмы в доме «'+VECTORS[v]+'» — суррогатное использование чужой функции ('+cfg.dark+')'); pen+=cfg.dark;
+
+  function axesMatch(A, B) {
+    var vals = [], names = [];
+    Object.keys(AXES).forEach(function (ax) {
+      var members = AXES[ax];
+      var aOn = members.some(function (k) { return A.levels[k] >= 2; });
+      var bOn = members.some(function (k) { return B.levels[k] >= 2; });
+      vals.push(aOn && bOn ? 1.0 : (aOn || bOn ? 0.2 : 0.0));
+      if (aOn && bOn) names.push(ax);
+    });
+    return { value: vals.reduce(function (s, v) { return s + v; }, 0) / 3.0, shared: names };
+  }
+
+  function darkFlags(A, B) {
+    var same = [], neuro = [];
+    KEYS.forEach(function (k) {
+      var dA = A.dark[k] || 0, dB = B.dark[k] || 0;
+      if (dA > 0 && dB > 0) { same.push(k); if (dA === 2 && dB === 2) neuro.push(k); }
+    });
+    return { same: same, neuro: neuro };
+  }
+
+  function friction(A, B) {
+    return KEYS.filter(function (k) { return A.levels[k] === 4 && B.levels[k] === 4; });
+  }
+
+  function compute(A, B, rtype) {
+    var cfg = CFG[rtype];
+    var lm = lightMatch(A, B);
+    var dm = doorsMatch(A, B);
+    var am = axesMatch(A, B);
+    var df = darkFlags(A, B);
+    var fr = friction(A, B);
+    var flags = [], veto = false;
+
+    if (df.same.length && cfg.veto) {
+      veto = true;
+      flags.push(['red', 'Совпадение тьмы: у обоих повторяющаяся тьма в векторе(ах) «' +
+        df.same.map(shortDark).join('», «') + '» — по закону 13 это не дополнение, а совместное падение. Вето.']);
     }
-  });
-  if(A.lead===B.lead && A.lead>=0){
-    const d=cfg.double;
-    if(d>0) out.push('Удвоение ведущего ('+VECTORS[A.lead]+') — для дружбы это плюс ('+(d>0?'+':'')+d+')');
-    else if(d<0) out.push('Удвоение ведущего ('+VECTORS[A.lead]+') — две одинаковые функции ('+d+')');
-    pen+=d;
+    var raw = cfg.light * lm + cfg.doors * dm.value + cfg.axes * am.value;
+    if (A.leading && A.leading === B.leading) {
+      raw += cfg.dl;
+      var kind = cfg.dl < 0 ? 'красный флаг' : (cfg.dl > 0 ? 'бонус' : 'особенность');
+      flags.push([cfg.dl < -10 ? 'red' : (cfg.dl > 0 ? 'green' : 'grey'),
+        'Удвоение ведущего вектора (' + TYPE_NAMES[rtype] + '): ' + kind +
+        ' ' + Math.abs(Math.round(cfg.dl)) + ' баллов.']);
+    }
+    if (df.same.length && !veto && cfg.dark) {
+      raw += cfg.dark;
+      flags.push([rtype === 'friend' ? 'yellow' : 'red',
+        'Совпадение тьмы в: ' + df.same.map(shortDark).join(', ') + ' (' + cfg.dark + ' баллов).']);
+    }
+    if (df.neuro.length && cfg.neuro) {
+      raw += cfg.neuro;
+      flags.push(['red', 'Невроз × невроз в: ' + df.neuro.map(shortDark).join(', ') +
+        ' (' + cfg.neuro + ' баллов).']);
+    }
+    if (fr.length) {
+      raw -= PEAK_FRICTION * fr.length;
+      flags.push(['grey', 'Трение встречных пиков: у обоих вершина в «' +
+        fr.map(function (k) { return VNAME[k]; }).join('», «') +
+        '» — реализация двух вершин одного рода стоит энергии (−' + Math.round(PEAK_FRICTION * fr.length) + ').']);
+    }
+    var score = veto ? 0 : Math.max(0, Math.min(100, Math.round(raw)));
+    return {
+      score: score, veto: veto,
+      layers: { light: lm, doors: dm, axes: am },
+      flags: flags, friction: fr,
+      sameDark: df.same, neuroDark: df.neuro
+    };
   }
-  return [out,pen];
-}
-function score(A,B,relType){
-  const cfg=REL[relType];
-  const [p1,d1]=layer1(A,B,cfg), [p2,d2]=layer2(A,B,cfg), [p3,ovl]=layer3(A,B,cfg);
-  const fr=friction(A,B), [fl,fp]=flags(A,B,relType);
-  const raw=p1+p2+p3+fp-fr;
-  const ceiling=Math.max(50,100-fr);
-  const percent=Math.max(0,Math.round(100*raw/ceiling));
-  return {percent, raw:Math.round(raw), ceiling, l1:Math.round(p1), l2:Math.round(p2),
-          l3:Math.round(p3), friction:fr, flags:fl, d1, d2, overlap:ovl.map(i=>VECTORS[i]), rel:relType};
-}
-function verdict(pct,flagsCount){
-  if(flagsCount>=2 && pct<25) return 'Красная зона пары: флаги перекрывают всё';
-  if(pct>=70) return 'Отличный потенциал';
-  if(pct>=55) return 'Сильная пара';
-  if(pct>=40) return 'Рабочий вариант';
-  if(pct>=20) return 'Рискованная связка';
-  return 'Флаги доминируют — осторожно';
-}
 
-/* ---- Кодек профиля в URL ---- */
-function encodeProfile(p){
-  const s=JSON.stringify(p);
-  const b=btoa(unescape(encodeURIComponent(s)));
-  return b.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
-}
-function decodeProfile(str){
-  let b=str.replace(/-/g,'+').replace(/_/g,'/');
-  while(b.length%4) b+='=';
-  return JSON.parse(decodeURIComponent(escape(atob(b))));
-}
-
-/* ---- Golden-корпус: 9 зафиксированных случаев (калибровка v2.1) ---- */
-const GOLDEN = [{"id": "construct_partner", "rel": "partner", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [3, 3, 3, 4, 2, 4, 3, 3], "lead": 3, "dark": {}, "light": [4, 5, 2]}, "expect": 60, "raw": 42, "ceiling": 70, "nflags": 0}, {"id": "door2_partner", "rel": "partner", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [1, 3, 1, 2, 2, 3, 3, 2], "lead": 1, "dark": {"2": 1}, "light": [3, 5, 6]}, "expect": 63, "raw": 57, "ceiling": 90, "nflags": 1}, {"id": "door2_friend", "rel": "friend", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [1, 3, 1, 2, 2, 3, 3, 2], "lead": 1, "dark": {"2": 1}, "light": [3, 5, 6]}, "expect": 60, "raw": 54, "ceiling": 90, "nflags": 1}, {"id": "door2_business", "rel": "business", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [1, 3, 1, 2, 2, 3, 3, 2], "lead": 1, "dark": {"2": 1}, "light": [3, 5, 6]}, "expect": 74, "raw": 67, "ceiling": 90, "nflags": 1}, {"id": "anti_partner", "rel": "partner", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [2, 4, 3, 1, 2, 1, 1, 2], "lead": 1, "dark": {"2": 2, "5": 1}, "light": [0]}, "expect": 0, "raw": -13, "ceiling": 80, "nflags": 2}, {"id": "self_p_partner", "rel": "partner", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "expect": 0, "raw": -3, "ceiling": 80, "nflags": 3}, {"id": "self_f_friend", "rel": "friend", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "expect": 74, "raw": 59, "ceiling": 80, "nflags": 3}, {"id": "self_b_business", "rel": "business", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "expect": 34, "raw": 27, "ceiling": 80, "nflags": 3}, {"id": "zero_partner", "rel": "partner", "a": {"v": [2, 3, 4, 3, 2, 2, 3, 2], "lead": 2, "dark": {"2": 2, "5": 1}, "light": [3, 7]}, "b": {"v": [0, 0, 0, 0, 0, 0, 0, 0], "lead": -1, "dark": {}, "light": []}, "expect": 1, "raw": 1, "ceiling": 90, "nflags": 0}];
-
-function runGoldenTests(){
-  const failures=[];
-  for(const t of GOLDEN){
-    const got=score(t.a,t.b,t.rel).percent;
-    if(got!==t.expect) failures.push(t.id+': ожидалось '+t.expect+', получено '+got);
+  /* ---- Кодек профиля в URL (base64url от JSON) ---- */
+  function b64urlEncode(str) {
+    var bytes = new TextEncoder().encode(str);
+    var bin = '';
+    bytes.forEach(function (b) { bin += String.fromCharCode(b); });
+    return btoa(bin).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
   }
-  return {ok:failures.length===0, failures, total:GOLDEN.length};
-}
+  function b64urlDecode(s) {
+    s = s.replace(/-/g, '+').replace(/_/g, '/');
+    while (s.length % 4) s += '=';
+    var bin = atob(s);
+    var bytes = new Uint8Array(bin.length);
+    for (var i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+    return new TextDecoder().decode(bytes);
+  }
+  function encodeProfile(p) {
+    var o = { v: {}, d: {}, l: p.light.slice().sort(), e: p.leading || '' };
+    KEYS.forEach(function (k) {
+      o.v[k] = p.levels[k] || 0;
+      if (p.dark[k]) o.d[k] = p.dark[k];
+    });
+    return b64urlEncode(JSON.stringify(o));
+  }
+  function decodeProfile(s) {
+    var o = JSON.parse(b64urlDecode(s));
+    var p = { levels: {}, dark: {}, light: o.l || [], leading: o.e || null };
+    KEYS.forEach(function (k) {
+      p.levels[k] = o.v[k] || 0;
+      p.dark[k] = o.d[k] || 0;
+    });
+    return p;
+  }
 
-if (typeof module!=='undefined') module.exports={score,runGoldenTests,encodeProfile,decodeProfile,VECTORS,REL};
+  function profileFromForm(levels, dark, light, leading) {
+    return { levels: levels, dark: dark, light: light, leading: leading };
+  }
+
+  /* ---- Golden-корпус (встроен, выполняется при каждой загрузке) ---- */
+  var GOLDEN = [
+    ['USER×DOOR2 partner',  'user', 'door2', 'partner', 63],
+    ['USER×DOOR2 friend',   'user', 'door2', 'friend', 60],
+    ['USER×DOOR2 business', 'user', 'door2', 'business', 74],
+    ['USER×CONSTRUCT partner', 'user', 'construct', 'partner', 60],
+    ['USER×ANTI partner',   'user', 'anti', 'partner', 0],
+    ['USER×USER partner',   'user', 'user', 'partner', 0],
+    ['USER×USER friend',    'user', 'user', 'friend', 74],
+    ['USER×USER business',  'user', 'user', 'business', 34],
+    ['USER×EMPTY partner',  'user', 'empty', 'partner', 1]
+  ];
+
+  var CORPUS = {
+    user:      { levels: {K:2,A:4,U:4,M:2,Z:1,S:1,O:1,Bn:3}, dark: {Z:2}, light: ['A','U','Bn'], leading: 'U' },
+    door2:     { levels: {K:2,A:2,U:1,M:3,Z:3,S:1,O:3,Bn:1}, dark: {Bn:1}, light: ['Z','O','A'], leading: 'Z' },
+    construct: { levels: {K:4,A:4,U:4,M:4,Z:4,S:4,O:4,Bn:4}, dark: {}, light: ['A','U','Bn'], leading: 'A' },
+    anti:      { levels: {K:4,A:3,U:0,M:1,Z:1,S:2,O:0,Bn:0}, dark: {Z:2,K:2}, light: [], leading: 'K' },
+    empty:     { levels: {K:0,A:0,U:0,M:0,Z:0,S:0,O:0,Bn:0}, dark: {}, light: [], leading: null }
+  };
+
+  function runGoldenTests() {
+    var results = [];
+    GOLDEN.forEach(function (c) {
+      var got = compute(CORPUS[c[1]], CORPUS[c[2]], c[3]).score;
+      results.push({ name: c[0], got: got, expected: c[4], ok: got === c[4] });
+    });
+    var passed = results.filter(function (r) { return r.ok; }).length;
+    return { passed: passed, total: results.length, results: results, ok: passed === results.length };
+  }
+
+  global.SVP = {
+    VECTORS: VECTORS, KEYS: KEYS, VNAME: VNAME, AXES: AXES,
+    DARK_NAMES: DARK_NAMES, LIGHT_NAMES: LIGHT_NAMES, TYPE_NAMES: TYPE_NAMES,
+    CFG: CFG, PEAK_FRICTION: PEAK_FRICTION,
+    compute: compute, encodeProfile: encodeProfile, decodeProfile: decodeProfile,
+    profileFromForm: profileFromForm, runGoldenTests: runGoldenTests, CORPUS: CORPUS
+  };
+})(window);
