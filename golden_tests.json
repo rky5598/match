@@ -1,418 +1,421 @@
 {
-  "engine": "svp-match",
-  "calibration": "v2.1",
-  "friction_per_mutual_peak": 10.5,
+  "version": "2.3",
   "cases": [
     {
-      "name": "USER×DOOR2 partner",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 2,
-          "U": 1,
-          "M": 3,
-          "Z": 3,
-          "S": 1,
-          "O": 3,
-          "Bn": 1
-        },
-        "dark": {
-          "Bn": 1
-        },
-        "light": [
-          "Z",
-          "O",
-          "A"
-        ],
-        "leading": "Z"
-      },
+      "name": "user-door2",
       "type": "partner",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 1,
+          "ko": 2,
+          "an": 3,
+          "mu": 3,
+          "zr": 3,
+          "or": 3,
+          "ob": 1,
+          "zv": 1
+        },
+        "d": {
+          "ob": 1
+        },
+        "l": [
+          "zr",
+          "or"
+        ],
+        "ld": "zr"
+      },
       "expected": 63
     },
     {
-      "name": "USER×DOOR2 friend",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 2,
-          "U": 1,
-          "M": 3,
-          "Z": 3,
-          "S": 1,
-          "O": 3,
-          "Bn": 1
-        },
-        "dark": {
-          "Bn": 1
-        },
-        "light": [
-          "Z",
-          "O",
-          "A"
-        ],
-        "leading": "Z"
-      },
+      "name": "user-door2",
       "type": "friend",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 1,
+          "ko": 2,
+          "an": 3,
+          "mu": 3,
+          "zr": 3,
+          "or": 3,
+          "ob": 1,
+          "zv": 1
+        },
+        "d": {
+          "ob": 1
+        },
+        "l": [
+          "zr",
+          "or"
+        ],
+        "ld": "zr"
+      },
       "expected": 60
     },
     {
-      "name": "USER×DOOR2 business",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 2,
-          "U": 1,
-          "M": 3,
-          "Z": 3,
-          "S": 1,
-          "O": 3,
-          "Bn": 1
-        },
-        "dark": {
-          "Bn": 1
-        },
-        "light": [
-          "Z",
-          "O",
-          "A"
-        ],
-        "leading": "Z"
-      },
+      "name": "user-door2",
       "type": "business",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 1,
+          "ko": 2,
+          "an": 3,
+          "mu": 3,
+          "zr": 3,
+          "or": 3,
+          "ob": 1,
+          "zv": 1
+        },
+        "d": {
+          "ob": 1
+        },
+        "l": [
+          "zr",
+          "or"
+        ],
+        "ld": "zr"
+      },
       "expected": 74
     },
     {
-      "name": "USER×CONSTRUCT partner",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 4,
-          "A": 4,
-          "U": 4,
-          "M": 4,
-          "Z": 4,
-          "S": 4,
-          "O": 4,
-          "Bn": 4
-        },
-        "dark": {},
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "A"
-      },
+      "name": "user-construct",
       "type": "partner",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 4,
+          "ko": 3,
+          "an": 3,
+          "mu": 3,
+          "zr": 4,
+          "or": 3,
+          "ob": 3,
+          "zv": 3
+        },
+        "d": {},
+        "l": [
+          "ur",
+          "ko",
+          "an",
+          "mu",
+          "zr",
+          "or",
+          "ob",
+          "zv"
+        ],
+        "ld": "ur"
+      },
       "expected": 60
     },
     {
-      "name": "USER×ANTI partner",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 4,
-          "A": 3,
-          "U": 0,
-          "M": 1,
-          "Z": 1,
-          "S": 2,
-          "O": 0,
-          "Bn": 0
-        },
-        "dark": {
-          "Z": 2,
-          "K": 2
-        },
-        "light": [],
-        "leading": "K"
-      },
+      "name": "user-anti",
       "type": "partner",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 1,
+          "ko": 4,
+          "an": 4,
+          "mu": 0,
+          "zr": 2,
+          "or": 0,
+          "ob": 1,
+          "zv": 1
+        },
+        "d": {
+          "ur": 2,
+          "zv": 2,
+          "zr": 1
+        },
+        "l": [
+          "ko"
+        ],
+        "ld": "ko"
+      },
       "expected": 0
     },
     {
-      "name": "USER×USER partner",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
+      "name": "user-self",
       "type": "partner",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
       "expected": 0
     },
     {
-      "name": "USER×USER friend",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
+      "name": "user-self",
       "type": "friend",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
       "expected": 74
     },
     {
-      "name": "USER×USER business",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
+      "name": "user-self",
       "type": "business",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
       "expected": 34
     },
     {
-      "name": "USER×EMPTY partner",
-      "a": {
-        "levels": {
-          "K": 2,
-          "A": 4,
-          "U": 4,
-          "M": 2,
-          "Z": 1,
-          "S": 1,
-          "O": 1,
-          "Bn": 3
-        },
-        "dark": {
-          "Z": 2
-        },
-        "light": [
-          "A",
-          "U",
-          "Bn"
-        ],
-        "leading": "U"
-      },
-      "b": {
-        "levels": {
-          "K": 0,
-          "A": 0,
-          "U": 0,
-          "M": 0,
-          "Z": 0,
-          "S": 0,
-          "O": 0,
-          "Bn": 0
-        },
-        "dark": {},
-        "light": [],
-        "leading": null
-      },
+      "name": "user-empty",
       "type": "partner",
+      "profileA": {
+        "v": {
+          "ur": 4,
+          "ko": 2,
+          "an": 3,
+          "mu": 2,
+          "zr": 1,
+          "or": 1,
+          "ob": 3,
+          "zv": 2
+        },
+        "d": {
+          "an": 1,
+          "zr": 1
+        },
+        "l": [
+          "ur",
+          "ob"
+        ],
+        "ld": "ur"
+      },
+      "profileB": {
+        "v": {
+          "ur": 0,
+          "ko": 0,
+          "an": 0,
+          "mu": 0,
+          "zr": 0,
+          "or": 0,
+          "ob": 0,
+          "zv": 0
+        },
+        "d": {},
+        "l": [],
+        "ld": null
+      },
       "expected": 1
     }
   ]

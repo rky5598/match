@@ -7,293 +7,366 @@
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div class="wrap">
+<header>
   <h1>Совместимость по векторам</h1>
-  <p class="sub">Закон 13 — совпадать по свету, дополняться по функции, не совпадать по тьме. Оценка — карта дверей, не приговор.</p>
+  <p class="legend">Закон 13 — совпадать по свету, дополняться по функции, не совпадать по тьме.
+  Оценка — карта дверей, не приговор.</p>
   <div id="banner" class="banner">Проверка движка…</div>
-  <div id="err" class="banner-err" style="display:none"></div>
+</header>
 
-  <section id="screen-home" class="screen" hidden>
-    <div class="card">
-      <h2>Что это</h2>
-      <p>Один человек создаёт свой профиль и получает <b>ссылку-приглашение</b>. Второй открывает её,
-      видит первый профиль, заполняет свой — и обе стороны получают совместимость: по слоям,
-      с флагами и зеркальными отчётами. Без регистрации и сервера: профиль зашит в ссылку.</p>
-      <button id="btn-start" class="btn">Создать свой профиль и ссылку</button>
-      <p class="hint">Если вам прислали ссылку с параметрами ?p=… — экран матча откроется автоматически.</p>
-    </div>
+<main>
+  <!-- ЭКРАН 1: главная -->
+  <section id="screenHome" class="card">
+    <h2>Что это</h2>
+    <p>Один человек создаёт свой профиль и получает <b>ссылку-приглашение</b>.
+    Второй открывает её, видит первый профиль, заполняет свой — и обе стороны
+    получают совместимость: по слоям, с флагами и зеркальными отчётами.
+    Без регистрации и сервера: профиль зашит в ссылку.</p>
+    <button id="btnStart" class="primary" disabled>Создать свой профиль и ссылку</button>
+    <p class="hint">Если пришли по ссылке с параметрами ?p=… — экран матча уже открыт ниже.</p>
   </section>
 
-  <section id="screen-form" class="screen" hidden>
-    <div class="card">
-      <h2 id="form-title">Свой профиль</h2>
-      <div id="inviter-box" hidden></div>
+  <!-- ЭКРАН 2: форма профиля (статическая разметка — не собирается скриптом) -->
+  <section id="screenForm" class="card" hidden>
+    <h2 id="formTitle">Ваш профиль</h2>
 
-      <h3>Уровни векторов (0–4)</h3>
-      <p class="hint">0 — вектор спит · 1 — есть, но редко · 2 — рабочий · 3 — сильный · 4 — вершина: даёт максимум и стоит энергии.</p>
-      <div class="row"><span class="vname">кожный <em class="axis">· Ида</em></span>
-      <input type="range" id="lvl-K" min="0" max="4" step="1" value="0" data-key="K">
-      <span class="lvlval" id="lvlv-K">0</span></div>
-<div class="row"><span class="vname">анальный <em class="axis">· Сушумна</em></span>
-      <input type="range" id="lvl-A" min="0" max="4" step="1" value="0" data-key="A">
-      <span class="lvlval" id="lvlv-A">0</span></div>
-<div class="row"><span class="vname">уретральный <em class="axis">· Пингала</em></span>
-      <input type="range" id="lvl-U" min="0" max="4" step="1" value="0" data-key="U">
-      <span class="lvlval" id="lvlv-U">0</span></div>
-<div class="row"><span class="vname">мышечный <em class="axis">· Ида</em></span>
-      <input type="range" id="lvl-M" min="0" max="4" step="1" value="0" data-key="M">
-      <span class="lvlval" id="lvlv-M">0</span></div>
-<div class="row"><span class="vname">зрительный <em class="axis">· Пингала</em></span>
-      <input type="range" id="lvl-Z" min="0" max="4" step="1" value="0" data-key="Z">
-      <span class="lvlval" id="lvlv-Z">0</span></div>
-<div class="row"><span class="vname">звуковой <em class="axis">· Сушумна</em></span>
-      <input type="range" id="lvl-S" min="0" max="4" step="1" value="0" data-key="S">
-      <span class="lvlval" id="lvlv-S">0</span></div>
-<div class="row"><span class="vname">оральный <em class="axis">· Пингала</em></span>
-      <input type="range" id="lvl-O" min="0" max="4" step="1" value="0" data-key="O">
-      <span class="lvlval" id="lvlv-O">0</span></div>
-<div class="row"><span class="vname">обонятельный <em class="axis">· Сушумна</em></span>
-      <input type="range" id="lvl-Bn" min="0" max="4" step="1" value="0" data-key="Bn">
-      <span class="lvlval" id="lvlv-Bn">0</span></div>
-
-      <h3>Повторяющаяся тьма</h3>
-      <p class="hint">Тьма — то, что возвращается и портит отношения. «Бывает» — эпизоды, «стало чертой» — невроз, максимальный риск в паре.</p>
-      <div class="grid4"><div class="cell"><label>кожный</label>
-  <select id="drk-K"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>анальный</label>
-  <select id="drk-A"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>уретральный</label>
-  <select id="drk-U"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>мышечный</label>
-  <select id="drk-M"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>зрительный</label>
-  <select id="drk-Z"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>звуковой</label>
-  <select id="drk-S"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>оральный</label>
-  <select id="drk-O"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div>
-<div class="cell"><label>обонятельный</label>
-  <select id="drk-Bn"><option value="0">нет</option><option value="1">бывает</option><option value="2">стало чертой</option></select></div></div>
-
-      <h3>Живущий свет</h3>
-      <p class="hint">Свет — то, что живёт и отдаётся. Отметьте то, что в вас по-настоящему работает.</p>
-      <div class="grid2"><label class="chk"><input type="checkbox" class="lightchk" value="K"> кожный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="A"> анальный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="U"> уретральный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="M"> мышечный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="Z"> зрительный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="S"> звуковой</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="O"> оральный</label>
-<label class="chk"><input type="checkbox" class="lightchk" value="Bn"> обонятельный</label></div>
-
-      <h3>Ведущий вектор</h3>
-      <select id="lead"><option value="">не указан</option><option value="K">кожный</option>
-<option value="A">анальный</option>
-<option value="U">уретральный</option>
-<option value="M">мышечный</option>
-<option value="Z">зрительный</option>
-<option value="S">звуковой</option>
-<option value="O">оральный</option>
-<option value="Bn">обонятельный</option></select>
-
-      <h3>Тип отношения</h3>
-      <select id="rel"><option value="partner">Партнёр</option>
-<option value="friend">Друг</option>
-<option value="business">Бизнес</option>
-<option value="parent_child">Родитель → ребёнок</option>
-<option value="child_parent">Ребёнок → родитель</option></select>
-
-      <p><button id="btn-go" class="btn">Создать ссылку</button></p>
-      <div id="link-box" hidden>
-        <p class="hint">Ссылка-приглашение — отправьте её второму человеку любым мессенджером. Профиль зашит в ссылку: не публикуйте её в открытых чатах.</p>
-        <input id="link-out" readonly>
-        <p><button id="btn-copy" class="btn small">Копировать</button>
-        <a id="link-open" class="btn small aslink">Открыть матч</a></p>
+    <h3>Уровни векторов (0 — пусто, 4 — вершина)</h3>
+      <div class="vec-row">
+        <div class="vec-label"><b>Уретральный</b><span class="vec-short">поток, бесстрашие, скорость</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-ur" min="0" max="4" step="1" value="0" aria-label="Уровень: Уретральный">
+          <output id="out-ur">0</output>
+        </div>
       </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Кожный</b><span class="vec-short">логика, дисциплина, границы</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-ko" min="0" max="4" step="1" value="0" aria-label="Уровень: Кожный">
+          <output id="out-ko">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Анальный</b><span class="vec-short">порядок, память, верность</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-an" min="0" max="4" step="1" value="0" aria-label="Уровень: Анальный">
+          <output id="out-an">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Мышечный</b><span class="vec-short">тело, движение, дом</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-mu" min="0" max="4" step="1" value="0" aria-label="Уровень: Мышечный">
+          <output id="out-mu">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Зрительный</b><span class="vec-short">эмоции, свет, сострадание</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-zr" min="0" max="4" step="1" value="0" aria-label="Уровень: Зрительный">
+          <output id="out-zr">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Оральный</b><span class="vec-short">слово, юмор, ласка</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-or" min="0" max="4" step="1" value="0" aria-label="Уровень: Оральный">
+          <output id="out-or">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Обонятельный</b><span class="vec-short">нюх, опора, оценка людей</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-ob" min="0" max="4" step="1" value="0" aria-label="Уровень: Обонятельный">
+          <output id="out-ob">0</output>
+        </div>
+      </div>
+      <div class="vec-row">
+        <div class="vec-label"><b>Звуковой</b><span class="vec-short">смысл, тишина, глубина</span></div>
+        <div class="vec-controls">
+          <input type="range" id="lvl-zv" min="0" max="4" step="1" value="0" aria-label="Уровень: Звуковой">
+          <output id="out-zv">0</output>
+        </div>
+      </div>
+
+    <h3>Повторяющаяся тьма</h3>
+    <p class="hint">Степень 1 — «бывает», степень 2 — «стало чертой». Тьма — не позор, а атом света (закон 24).</p>
+      <div class="dark-row">
+        <label for="dark-ur">Уретральный</label>
+        <select id="dark-ur">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-ko">Кожный</label>
+        <select id="dark-ko">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-an">Анальный</label>
+        <select id="dark-an">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-mu">Мышечный</label>
+        <select id="dark-mu">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-zr">Зрительный</label>
+        <select id="dark-zr">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-or">Оральный</label>
+        <select id="dark-or">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-ob">Обонятельный</label>
+        <select id="dark-ob">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+      <div class="dark-row">
+        <label for="dark-zv">Звуковой</label>
+        <select id="dark-zv">
+          <option value="0" selected>нет</option>
+          <option value="1">бывает (степень 1)</option>
+          <option value="2">стало чертой (степень 2)</option>
+        </select>
+      </div>
+
+    <h3>Живущий свет</h3>
+    <p class="hint">Отметьте векторы, свет которых вы реально отдаёте людям, а не декларируете.</p>
+    <div class="light-grid">
+      <label class="light-cell"><input type="checkbox" id="light-ur"> Уретральный</label>
+      <label class="light-cell"><input type="checkbox" id="light-ko"> Кожный</label>
+      <label class="light-cell"><input type="checkbox" id="light-an"> Анальный</label>
+      <label class="light-cell"><input type="checkbox" id="light-mu"> Мышечный</label>
+      <label class="light-cell"><input type="checkbox" id="light-zr"> Зрительный</label>
+      <label class="light-cell"><input type="checkbox" id="light-or"> Оральный</label>
+      <label class="light-cell"><input type="checkbox" id="light-ob"> Обонятельный</label>
+      <label class="light-cell"><input type="checkbox" id="light-zv"> Звуковой</label>
+    </div>
+
+    <h3>Ведущий вектор</h3>
+    <select id="lead">
+      <option value="">— не указан —</option>
+        <option value="ur">Уретральный</option>
+        <option value="ko">Кожный</option>
+        <option value="an">Анальный</option>
+        <option value="mu">Мышечный</option>
+        <option value="zr">Зрительный</option>
+        <option value="or">Оральный</option>
+        <option value="ob">Обонятельный</option>
+        <option value="zv">Звуковой</option>
+    </select>
+
+    <h3>Тип отношений для ссылки</h3>
+    <select id="reltype">
+      <option value="partner" selected>Партнёр</option>
+      <option value="friend">Друг</option>
+      <option value="business">Бизнес</option>
+    </select>
+
+    <div class="btn-row">
+      <button id="btnCreate" class="primary" disabled>Создать ссылку</button>
+      <button id="btnMatch" class="primary" hidden disabled>Рассчитать совместимость</button>
+      <button id="btnBackHome">На главную</button>
+    </div>
+
+    <div id="linkBox" hidden>
+      <h3>Ссылка-приглашение</h3>
+      <p class="hint">Отправьте её второму человеку любым мессенджером. Профиль зашит в ссылку — не публикуйте её в открытых чатах.</p>
+      <input id="linkField" readonly>
+      <button id="btnCopy">Скопировать</button>
     </div>
   </section>
 
-  <section id="screen-result" class="screen" hidden>
-    <div class="card" id="result"></div>
+  <!-- ЭКРАН 3: матч и результат -->
+  <section id="screenMatch" class="card" hidden>
+    <h2>Матч</h2>
+    <div id="partnerSummary"></div>
+    <div id="resultBox"></div>
   </section>
-</div>
+</main>
+
+<footer>
+  <p class="hint">Сервис работает полностью на вашей стороне: без сервера, без регистрации,
+  профиль переносится только внутри ссылки. Профиль — снимок (закон 14): он меняется вместе с уровнями.</p>
+</footer>
+
 <script src="compatibility_module.js"></script>
 <script>
 (function () {
   'use strict';
-  var S = window.SVP;
-  var inviteMode = false, inviter = null, relParam = 'partner';
-
-  function $(id) { return document.getElementById(id); }
-  function showErr(e) {
-    var el = $('err');
-    el.style.display = 'block';
-    el.textContent = 'Ошибка страницы: ' + (e && e.message ? e.message : e);
+  var banner = document.getElementById('banner');
+  function showBanner(text, kind) {
+    banner.textContent = text;
+    banner.className = 'banner ' + kind;
   }
-  function show(id) { $(id).hidden = false; }
-  function hide(id) { $(id).hidden = true; }
+  function fatal(msg) { showBanner('Ошибка страницы: ' + msg, 'bad'); }
 
-  function banner(ok) {
-    var el = $('banner');
-    if (ok.ok) {
-      el.className = 'banner ok';
-      el.textContent = 'Проверка движка: golden-тесты ' + ok.passed + '/' + ok.total +
-        ' пройдены — калибровка v2.1 подтверждена';
-    } else {
-      el.className = 'banner bad';
-      el.textContent = 'СБОЙ КАЛИБРОВКИ: golden-тесты ' + ok.passed + '/' + ok.total +
-        ' — отчёты заблокированы. Случаи: ' + ok.results.filter(function(r){return !r.ok;})
-          .map(function(r){ return r.name + ' (' + r.got + '!=' + r.expected + ')'; }).join('; ');
+  window.addEventListener('error', function (e) { fatal(e.message || 'неизвестная ошибка скрипта'); });
+
+  function el(id) { return document.getElementById(id); }
+
+  function readProfileFromForm() {
+    var p = { v: {}, d: {}, l: [], ld: null };
+    var vecs = window.SVP ? SVP.VECTORS : [];
+    for (var i = 0; i < vecs.length; i++) {
+      var id = vecs[i].id;
+      p.v[id] = parseInt(el('lvl-' + id).value, 10) || 0;
+      var dv = parseInt(el('dark-' + id).value, 10) || 0;
+      if (dv > 0) p.d[id] = dv;
+      if (el('light-' + id).checked) p.l.push(id);
     }
+    p.ld = el('lead').value || null;
+    return p;
   }
-
-  function readForm() {
-    var levels = {}, dark = {}, light = [], leading = null;
-    S.KEYS.forEach(function (k) {
-      levels[k] = parseInt($('lvl-' + k).value, 10) || 0;
-      dark[k] = parseInt($('drk-' + k).value, 10) || 0;
-      if (dark[k] === 0) delete dark[k];
-    });
-    Array.prototype.forEach.call(document.querySelectorAll('.lightchk'), function (c) {
-      if (c.checked) light.push(c.value);
-    });
-    var lv = $('lead').value;
-    if (lv) leading = lv;
-    return S.profileFromForm(levels, dark, light, leading);
+  function fillFormFromProfile(p) {
+    var vecs = SVP.VECTORS;
+    for (var i = 0; i < vecs.length; i++) {
+      var id = vecs[i].id;
+      el('lvl-' + id).value = p.v[id] || 0;
+      el('out-' + id).textContent = String(p.v[id] || 0);
+      el('dark-' + id).value = String(p.d[id] || 0);
+      el('light-' + id).checked = (p.l || []).indexOf(id) !== -1;
+    }
+    el('lead').value = p.ld || '';
   }
 
   function profileSummary(p) {
-    var h = '<div class="psum"><h3>Профиль собеседника</h3><table class="tbl"><tr><th>Вектор</th><th>Уровень</th><th>Тьма</th><th>Свет</th></tr>';
-    S.KEYS.forEach(function (k) {
-      var d = p.dark[k] ? (p.dark[k] === 2 ? 'стало чертой' : 'бывает') : '—';
-      var l = p.light.indexOf(k) >= 0 ? '✓' : '—';
-      h += '<tr><td>' + S.VNAME[k] + '</td><td>' + p.levels[k] + '</td><td>' + d + '</td><td>' + l + '</td></tr>';
-    });
-    h += '</table><p>Ведущий вектор: <b>' + (p.leading ? S.VNAME[p.leading] : 'не указан') + '</b></p></div>';
-    return h;
+    var lines = [], vecs = SVP.VECTORS;
+    for (var i = 0; i < vecs.length; i++) {
+      var id = vecs[i].id, lv = p.v[id] || 0;
+      if (lv > 0) lines.push(vecs[i].name + ': ' + lv);
+    }
+    var extra = [];
+    for (i = 0; i < vecs.length; i++) {
+      var id2 = vecs[i].id;
+      if (p.d[id2] >= 1) extra.push('тьма: ' + vecs[i].name + ' (ст. ' + p.d[id2] + ')');
+    }
+    if (p.ld) extra.push('ведущий: ' + SVP.vecName(p.ld));
+    return '<b>Профиль приглашающего:</b> ' + lines.join(' · ') +
+      (extra.length ? '<br><span class="hint">' + extra.join(' · ') + '</span>' : '');
   }
 
-  function verdictText(score, r) {
-    if (r.veto) return 'Вето по совпадению тьмы. Это не «плохой человек» — это совпадение ям. Дружба и пары на общем падении не лечатся.';
-    if (score >= 65) return 'Сильная живая связка. Свет общий, двери открыты в обе стороны — берегите трение пиков: двум ярким нужно место, чтобы уставать порознь.';
-    if (score >= 50) return 'Рабочая связка: есть общий свет и открытые двери, но часть тьмы никто не закрывает — это зона роста, её проходят вдвоём.';
-    if (score >= 30) return 'Связка на выдержке: мало общего света, двери прикрыты. Работает, если функции разделены честно — по закону 13, а не по привычке.';
-    return 'Слабая связка: слои почти не пересекаются. Это не приговор человеку — это карта: рядом таким, как вы, обычно живут по разным осям.';
+  function renderResult(res) {
+    var html = '';
+    html += '<div class="score">Совместимость: <b>' + res.total + '%</b>';
+    html += ' <span class="hint">живой потолок для этого типа: ' + res.ceiling + '%</span></div>';
+    html += '<p class="verdict">' + res.verdict + '</p>';
+    if (res.layers && res.layers.length) {
+      html += '<h3>Слои</h3>';
+      for (var i = 0; i < res.layers.length; i++) {
+        var L = res.layers[i];
+        var pct = L.max ? Math.round(100 * L.got / L.max) : 0;
+        html += '<div class="layer"><div class="layer-name">' + L.name + ': ' + Math.round(L.got) +
+                '</div><div class="bar"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+      }
+    }
+    if (res.flags && res.flags.length) {
+      html += '<h3>Флаги</h3><ul>';
+      for (i = 0; i < res.flags.length; i++) html += '<li class="flag">' + res.flags[i] + '</li>';
+      html += '</ul>';
+    }
+    if (res.reports) {
+      html += '<h3>Что вам даёт партнёр</h3><ul>';
+      for (i = 0; i < res.reports.fromOther.length; i++) html += '<li>' + res.reports.fromOther[i] + '</li>';
+      html += '</ul><h3>Что вы даёте партнёру</h3><ul>';
+      for (i = 0; i < res.reports.toOther.length; i++) html += '<li>' + res.reports.toOther[i] + '</li>';
+      html += '</ul>';
+    }
+    el('resultBox').innerHTML = html;
   }
 
-  function renderResult(A, B, rtype) {
-    var r = S.compute(A, B, rtype);
-    var h = '';
-    h += '<div class="scorecard"><div class="score">' + r.score + '<span>%</span></div>';
-    h += '<div class="scoretype">' + S.TYPE_NAMES[rtype] + '</div></div>';
-    h += '<p class="verdict">' + verdictText(r.score, r) + '</p>';
-
-    h += '<h3>Слои</h3><div class="layer"><span>Совпадение света</span><div class="bar"><i style="width:' +
-      Math.round(r.layers.light * 100) + '%"></i></div><span>' + Math.round(r.layers.light * 100) + '%</span></div>';
-    h += '<div class="layer"><span>Двери (закон 13)</span><div class="bar"><i style="width:' +
-      Math.round(r.layers.doors.value * 100) + '%"></i></div><span>' +
-      Math.round(r.layers.doors.value * 100) + '% (' + r.layers.doors.covered + '/' + r.layers.doors.total + ')</span></div>';
-    h += '<div class="layer"><span>Оси (нади)</span><div class="bar"><i style="width:' +
-      Math.round(r.layers.axes.value * 100) + '%"></i></div><span>' + Math.round(r.layers.axes.value * 100) + '%</span></div>';
-    if (r.layers.axes.shared.length)
-      h += '<p class="hint">Совпавшие оси: ' + r.layers.axes.shared.join(', ') + '.</p>';
-
-    if (r.flags.length) {
-      h += '<h3>Флаги</h3><ul class="flags">';
-      r.flags.forEach(function (f) { h += '<li class="flag-' + f[0] + '">' + f[1] + '</li>'; });
-      h += '</ul>';
-    } else h += '<p class="hint">Флагов нет.</p>';
-
-    h += '<h3>Что вам даёт партнёр</h3><ul>';
-    var hasA = false;
-    r.layers.doors.detail.forEach(function (d) {
-      if (d[0] === 'give') { hasA = true;
-        h += '<li>Закрывает вашу тьму «' + S.DARK_NAMES[d[1]].split(',')[0] + '» своей сильной функцией: ' + S.VNAME[d[1]] + ' — ' + S.LIGHT_NAMES[d[1]] + '.</li>'; }
-    });
-    if (r.layers.light > 0) { hasA = true;
-      h += '<li>Общий свет: ' + A.light.filter(function(k){return B.light.indexOf(k)>=0;})
-        .map(function(k){ return S.VNAME[k] + ' (' + S.LIGHT_NAMES[k].split(',')[0] + ')'; }).join(', ') + '.</li>'; }
-    if (!hasA) h += '<li>Из сильных функций пока ничего не течёт в вашу тьму — смотрите слой «двери».</li>';
-    h += '</ul>';
-
-    h += '<h3>Что вы даёте партнёру</h3><ul>';
-    var hasB = false;
-    r.layers.doors.detail.forEach(function (d) {
-      if (d[0] === 'get') { hasB = true;
-        h += '<li>Закрываете его тьму «' + S.DARK_NAMES[d[1]].split(',')[0] + '» своей силой: ' + S.VNAME[d[1]] + ' — ' + S.LIGHT_NAMES[d[1]] + '.</li>'; }
-    });
-    if (r.layers.light > 0) { hasB = true;
-      h += '<li>Свет, который вы разделяете, — опора для обоих.</li>'; }
-    if (!hasB) h += '<li>Ваши сильные функции не попадают в тьму партнёра — дверь прикрыта.</li>';
-    h += '</ul>';
-
-    h += '<p class="hint">Счёт — вторичная сводка. Живые пары живут в диапазоне 40–75%; число выше живого потолка — повод проверить калибровку, а не радоваться.</p>';
-    return h;
-  }
-
-  function buildLink(p, rtype) {
-    var base = location.origin + location.pathname;
-    return base + '?p=' + S.encodeProfile(p) + '&r=' + rtype;
-  }
+  var partnerProfile = null;
 
   function init() {
-    try {
-      if (!S) throw new Error('движок не загрузился');
-      banner(S.runGoldenTests());
+    if (!window.SVP || !SVP.VERSION) { fatal('движок не загрузился — проверьте, что compatibility_module.js лежит рядом с match.html'); return; }
+    var res = SVP.runGolden();
+    var failed = [];
+    for (var i = 0; i < res.length; i++) if (!res[i].ok) failed.push(res[i].name + ' (' + res[i].got + '≠' + res[i].want + ')');
+    if (failed.length) { fatal('golden-тесты провалены: ' + failed.join('; ')); return; }
+    showBanner('Проверка движка: golden-тесты ' + res.length + '/' + res.length + ' пройдены — калибровка v' + SVP.VERSION + ' подтверждена', 'good');
+    el('btnStart').disabled = false;
 
-      var q = new URLSearchParams(location.search);
-      var pRaw = q.get('p');
-      relParam = q.get('r') || 'partner';
-      if (pRaw) {
-        inviter = S.decodeProfile(pRaw);
-        inviteMode = true;
-        $('form-title').textContent = 'Ваш профиль';
-        $('inviter-box').innerHTML = profileSummary(inviter);
-        $('inviter-box').hidden = false;
-        $('rel').value = relParam;
-        $('btn-go').textContent = 'Рассчитать совместимость';
-        show('screen-form');
-      } else {
-        show('screen-home');
-      }
-    } catch (e) { showErr(e); }
+    var params = new URLSearchParams(location.search);
+    if (params.get('p')) {
+      try {
+        partnerProfile = SVP.decodeProfile(params.get('p'));
+        el('partnerSummary').innerHTML = profileSummary(partnerProfile);
+        el('screenHome').hidden = true;
+        el('screenForm').hidden = false;
+        el('screenMatch').hidden = false;
+        el('formTitle').textContent = 'Ваш профиль (второй участник)';
+        el('reltype').value = params.get('r') || 'partner';
+        el('btnCreate').hidden = true;
+        el('btnMatch').hidden = false;
+        el('btnMatch').disabled = false;
+        window.scrollTo(0, 0);
+      } catch (err) { fatal('не удалось прочитать профиль из ссылки: ' + err.message); }
+    }
   }
 
-  $('btn-start').addEventListener('click', function () {
-    hide('screen-home'); show('screen-form');
+  document.addEventListener('DOMContentLoaded', init);
+
+  el('btnStart').addEventListener('click', function () {
+    el('screenHome').hidden = true;
+    el('screenForm').hidden = false;
+  });
+  el('btnBackHome').addEventListener('click', function () {
+    el('screenForm').hidden = true;
+    el('screenHome').hidden = false;
   });
 
-  Array.prototype.forEach.call(document.querySelectorAll('input[type=range]'), function (r) {
-    r.addEventListener('input', function () { $('lvlv-' + r.dataset.key).textContent = r.value; });
+  document.addEventListener('input', function (e) {
+    if (e.target && e.target.id && e.target.id.indexOf('lvl-') === 0) {
+      el(e.target.id.replace('lvl-', 'out-')).textContent = e.target.value;
+    }
   });
 
-  $('btn-go').addEventListener('click', function () {
-    try {
-      var me = readForm();
-      var rtype = $('rel').value;
-      if (inviteMode) {
-        $('result').innerHTML = renderResult(inviter, me, rtype);
-        hide('screen-form'); show('screen-result');
-      } else {
-        var link = buildLink(me, rtype);
-        $('link-out').value = link;
-        $('link-open').href = link;
-        $('link-box').hidden = false;
-      }
-    } catch (e) { showErr(e); }
+  el('btnCreate').addEventListener('click', function () {
+    var p = readProfileFromForm();
+    var type = el('reltype').value;
+    var link = location.origin + location.pathname + '?p=' + SVP.encodeProfile(p) + '&r=' + type;
+    el('linkField').value = link;
+    el('linkBox').hidden = false;
   });
 
-  $('btn-copy').addEventListener('click', function () {
-    var inp = $('link-out');
-    inp.select();
-    if (navigator.clipboard && navigator.clipboard.writeText)
-      navigator.clipboard.writeText(inp.value);
-    else document.execCommand('copy');
-    $('btn-copy').textContent = 'Скопировано ✓';
-    setTimeout(function () { $('btn-copy').textContent = 'Копировать'; }, 1500);
+  el('btnCopy').addEventListener('click', function () {
+    el('linkField').select();
+    try { document.execCommand('copy'); showBanner('Ссылка скопирована', 'good'); } catch (e) {}
   });
 
-  init();
+  el('btnMatch').addEventListener('click', function () {
+    if (!partnerProfile) return;
+    var mine = readProfileFromForm();
+    var type = el('reltype').value;
+    var res = SVP.calculate(mine, partnerProfile, type);
+    renderResult(res);
+    el('resultBox').scrollIntoView({ behavior: 'smooth' });
+  });
 })();
 </script>
 </body>
