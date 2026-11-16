@@ -1,11 +1,386 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<meta http-equiv="refresh" content="0; url=match.html">
-<title>Совместимость по векторам</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Карта состояния</title>
+<link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<p>Открывается сервис… Если ничего не произошло — <a href="match.html">перейти вручную</a>.</p>
+<div id="err" class="err" hidden></div>
+<nav id="prog">
+  <span data-b="red">Скрининг</span>
+  <span data-b="law2">Зона</span>
+  <span data-b="vector">Карта</span>
+  <span data-b="stage">Стадия</span>
+  <span data-b="report">Отчёт</span>
+</nav>
+<main id="app"></main>
+<script src="compatibility_module.js"></script>
+<script src="anketa_module.js"></script>
+<script>
+'use strict';
+(function () {
+  var app = document.getElementById('app');
+  var errBox = document.getElementById('err');
+  function showErr(msg) { errBox.textContent = 'Ошибка: ' + msg; errBox.hidden = false; }
+  window.addEventListener('error', function (e) { showErr(e.message || String(e)); });
+  if (typeof SVP === 'undefined' || typeof Anketa === 'undefined') {
+    showErr('Модули не загрузились. Откройте index.html из папки, где рядом лежат compatibility_module.js и anketa_module.js.');
+    return;
+  }
+  function esc(s) { return String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;'); }
+
+  var CFG = Anketa.CONFIG;
+  var byId = {};
+  CFG.screens.forEach(function (s) { byId[s.id] = s; });
+
+  var state = { answers: {}, cur: 'welcome', routeName: null, routeMsg: '', toReport: false, resume: null, notices: [], passed: {}, ownCode: null, partnerCode: null };
+  try {
+    var raw = localStorage.getItem('svp_state');
+    if (raw) { var p = JSON.parse(raw); if (p && p.answers) state = p; }
+  } catch (e) {}
+  function save() { try { localStorage.setItem('svp_state', JSON.stringify(state)); } catch (e) {} }
+
+  function optVal(o) { return typeof o === 'string' ? o : o.v; }
+  function optText(o) { return typeof o === 'string' ? o : o.t; }
+
+  function branchHit(b) {
+    var w = b.when;
+    if (w === 'tie') return false;
+    if (w.any_of) {
+      for (var i = 0; i < w.any_of.length; i++) {
+        var kv = w.any_of[i].split('=');
+        if (state.answers[kv[0]] === kv[1]) return true;
+      }
+      return false;
+    }
+    for (var k in w) { if (state.answers[k] !== w[k]) return false; }
+    return true;
+  }
+
+  function nextId(id) {
+    var ids = CFG.screens.map(function (x) { return x.id; });
+    var i = ids.indexOf(id);
+    if (i < 0 || i + 1 >= ids.length) return null;
+    return ids[i + 1];
+  }
+
+  function answer(s, idx) {
+    try {
+      state.answers[s.id] = optVal(s.options[idx]);
+      save();
+      var bs = CFG.branches || [];
+      for (var i = 0; i < bs.length; i++) {
+        var b = bs[i];
+        if (b.when === 'tie') continue;
+        if (state.passed[b.route]) continue;
+        if (!branchHit(b)) continue;
+        state.passed[b.route] = true;
+        if (b.stop) {
+          state.routeName = b.route;
+          state.routeMsg = b.message || '';
+          if (b.route === 'light') { state.toReport = true; }
+          else { state.resume = s.id; state.toReport = false; }
+          state.cur = 'route'; save(); render(); return;
+        }
+        state.notices.push(b.message || '');
+        break;
+      }
+      var nid = nextId(s.id);
+      if (!nid) { finish(); return; }
+      state.cur = nid; save(); render();
+    } catch (e) { showErr('answer: ' + (e && e.message ? e.message : e)); }
+  }
+
+  function leaderTie() {
+    try {
+      var w3 = { often: 3, sometimes: 2, rarely: 1 };
+      var cnt = {};
+      Anketa.ORDER.forEach(function (v) { cnt[v] = 0; });
+      CFG.screens.forEach(function (s) {
+        var a = state.answers[s.id];
+        if (a == null) return;
+        var v = s.id.slice(0, 2);
+        if (s.id === 'ur2') { if (a === 'none' || a === 'lost') cnt.ur += 1; return; }
+        if (s.id === 'or2') { if (a === 'flooding' || a === 'blocked') cnt.or += 1; return; }
+        if (s.id.slice(0, 2) === 'st') return;
+        if (w3[a] != null) cnt[v] += w3[a];
+      });
+      var max = -1, top = [];
+      Anketa.ORDER.forEach(function (v) {
+        if (cnt[v] > max) { max = cnt[v]; top = [v]; }
+        else if (cnt[v] === max) top.push(v);
+      });
+      return top.length > 1;
+    } catch (e) { return false; }
+  }
+
+  function openReport() {
+    try {
+      var prof = Anketa.deriveProfile(state.answers);
+      state.ownCode = Anketa.encodeProfile(prof);
+      state.cur = 'report'; save(); render();
+    } catch (e) { showErr('openReport: ' + (e && e.message ? e.message : e)); }
+  }
+  function finish() {
+    try {
+      if (leaderTie()) {
+        state.routeName = 'tiebreak';
+        state.routeMsg = 'Счёт ведущих векторов ничейный — ведущий определён тай-брейком. Подробности в отчёте.';
+        state.toReport = true; state.cur = 'route'; save(); render(); return;
+      }
+      openReport();
+    } catch (e) { showErr('finish: ' + (e && e.message ? e.message : e)); }
+  }
+
+  function noticesHtml() {
+    if (!state.notices || !state.notices.length) return '';
+    var h = '<div class="notices">';
+    state.notices.forEach(function (n) { h += '<div class="notice">' + esc(n) + '</div>'; });
+    h += '</div>';
+    return h;
+  }
+
+  function rWelcome() {
+    var w = CFG.welcome;
+    var h = '<h1>' + esc(w.title) + '</h1><p>' + esc(w.text) + '</p><ul class="rules">';
+    (w.rules || []).forEach(function (r) { h += '<li>' + esc(r) + '</li>'; });
+    h += '</ul><button id="go" class="primary">Начать</button>';
+    h += '<button id="resume" class="ghost">Продолжить сохранённое</button>';
+    h += '<p class="muted">Ответы хранятся только на этом устройстве.</p>';
+    app.innerHTML = h;
+    document.getElementById('go').addEventListener('click', function () { state.cur = CFG.screens[0].id; save(); render(); });
+    document.getElementById('resume').addEventListener('click', function () {
+      if (state.ownCode) { state.cur = 'report'; }
+      else {
+        var c = null;
+        for (var i = 0; i < CFG.screens.length; i++) { if (state.answers[CFG.screens[i].id] == null) { c = CFG.screens[i].id; break; } }
+        state.cur = c || CFG.screens[CFG.screens.length - 1].id;
+      }
+      save(); render();
+    });
+  }
+
+  function rQuestion() {
+    var s = byId[state.cur];
+    if (!s) { state.cur = 'welcome'; render(); return; }
+    var h = noticesHtml();
+    h += '<h2>' + esc(s.question) + '</h2>';
+    if (s.hint) h += '<p class="hint">' + esc(s.hint) + '</p>';
+    if (s.help && s.help.examples && s.help.examples.length) {
+      h += '<details class="help"><summary>' + esc(s.help.title || 'Как это выглядит в жизни') + '</summary><ul>';
+      s.help.examples.forEach(function (ex) {
+        if (typeof ex === 'string') h += '<li>' + esc(ex) + '</li>';
+        else h += '<li>' + esc(ex.case || '') + (ex.to ? ' <b>&rarr; ' + esc(ex.to) + '</b>' : '') + '</li>';
+      });
+      h += '</ul></details>';
+    }
+    h += '<div class="opts">';
+    s.options.forEach(function (o, i) { h += '<button class="opt" data-i="' + i + '">' + esc(optText(o)) + '</button>'; });
+    h += '</div>';
+    app.innerHTML = h;
+    Array.prototype.forEach.call(app.querySelectorAll('.opt'), function (btn) {
+      btn.addEventListener('click', function () { answer(s, parseInt(btn.getAttribute('data-i'), 10)); });
+    });
+  }
+
+  function rRoute() {
+    var h = noticesHtml();
+    h += '<h2>' + (state.routeName === 'red_zone' ? 'Красная зона' : 'Маршрут') + '</h2>';
+    h += '<p>' + esc(state.routeMsg) + '</p>';
+    if (state.routeName === 'red_zone') {
+      h += '<a class="primary hotline" href="tel:88002000122">8 800 2000-122 — телефон доверия</a>';
+      h += '<p class="muted">Бесплатно, круглосуточно, по России.</p>';
+    }
+    if (state.toReport) h += '<button id="toReport" class="primary">Открыть отчёт</button>';
+    if (state.resume) h += '<button id="cont" class="ghost">Всё равно продолжить анкету</button>';
+    app.innerHTML = h;
+    if (state.toReport) document.getElementById('toReport').addEventListener('click', openReport);
+    if (state.resume) document.getElementById('cont').addEventListener('click', function () { state.cur = state.resume; state.resume = null; save(); render(); });
+  }
+
+  function rReport() {
+    var h = noticesHtml();
+    h += '<h2>Отчёт</h2>';
+    h += '<div class="code">Ваш код: <b>' + esc(state.ownCode || '—') + '</b></div>';
+    var rep = null, errTxt = '';
+    try { rep = Anketa.buildReport(state.answers); } catch (e) { errTxt = String(e && e.message ? e.message : e); }
+    if (rep) h += '<div class="report">' + esc(rep) + '</div>';
+    else if (errTxt) h += '<p class="muted">Отчёт не собрался (' + esc(errTxt) + '), но код профиля готов — матч работает и без отчёта.</p>';
+    h += '<div class="row">';
+    h += '<button id="bShare" class="primary">Ссылка для партнёра</button>';
+    h += '<button id="bMatch">Считать матч</button>';
+    h += '<button id="bCircle">Круг</button>';
+    h += '</div>';
+    app.innerHTML = h;
+    document.getElementById('bShare').addEventListener('click', share);
+    document.getElementById('bMatch').addEventListener('click', function () { state.cur = 'match'; save(); render(); });
+    document.getElementById('bCircle').addEventListener('click', function () { state.cur = 'circle'; save(); render(); });
+  }
+
+  function share() {
+    try {
+      var base = location.href.split('?')[0].split('#')[0];
+      var url = base + '?q=' + encodeURIComponent(state.ownCode || '');
+      var done = function () { flash('Скопировано'); };
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(url).then(done, function () { window.prompt('Скопируйте ссылку:', url); });
+      } else { window.prompt('Скопируйте ссылку:', url); }
+    } catch (e) { showErr('share: ' + (e && e.message ? e.message : e)); }
+  }
+  function flash(msg) {
+    var d = document.createElement('div'); d.className = 'toast'; d.textContent = msg;
+    document.body.appendChild(d);
+    setTimeout(function () { if (d.parentNode) d.parentNode.removeChild(d); }, 1800);
+  }
+
+  var CODE_RE = /v1:(?:[0-4]{8}:[01]{8}:[0-7]|e)/;
+  function parseCode(s) {
+    var m = String(s || '').match(CODE_RE);
+    return m ? m[0] : null;
+  }
+
+  function rMatch() {
+    var h = noticesHtml();
+    h += '<h2>Матч</h2>';
+    h += '<p class="muted">Вставьте код партнёра или его ссылку (с ?q=). Свой код подставлен из ваших ответов — если анкета не пройдена, впишите оба кода вручную.</p>';
+    h += '<label>Код вашего профиля<input id="ownCode" value="' + esc(state.ownCode || '') + '" placeholder="v1:00000000:00000000:0"></label>';
+    h += '<label>Код или ссылка партнёра<input id="pc" value="' + esc(state.partnerCode || '') + '" placeholder="v1:00000000:00000000:0"></label>';
+    h += '<button id="doMatch" class="primary">Считать матч</button>';
+    h += '<div id="mres"></div>';
+    app.innerHTML = h;
+    document.getElementById('doMatch').addEventListener('click', doMatch);
+  }
+
+  function doMatch() {
+    try {
+      var oc = parseCode(document.getElementById('ownCode').value);
+      var pc = parseCode(document.getElementById('pc').value);
+      if (!oc) { showErr('Код вашего профиля не распознан. Формат: v1:XXXXXXXX:XXXXXXXX:N'); return; }
+      if (!pc) { showErr('Код партнёра не распознан. Формат: v1:XXXXXXXX:XXXXXXXX:N'); return; }
+      var a = SVP.decodeProfile(oc), b = SVP.decodeProfile(pc);
+      if (!a || !b) { showErr('Профили не разобрались.'); return; }
+      a.name = a.name || 'Вы'; b.name = b.name || 'Партнёр';
+      state.ownCode = oc; state.partnerCode = pc; save();
+      var names = { partners: 'Партнёры', business: 'Бизнес', friends: 'Друзья' };
+      var h = '';
+      ['partners', 'business', 'friends'].forEach(function (md) {
+        var r = SVP.match(a, b, md);
+        h += '<div class="score"><span>' + names[md] + '</span><b>' + r.score + '</b></div>';
+        if (r.empty) h += '<p class="muted">Один из профилей пуст (код «v1:e») — карта без данных.</p>';
+      });
+      var f = SVP.match(a, b, 'partners').f;
+      if (f) {
+        h += '<h3>Разбор</h3><ul>';
+        h += '<li>Общий свет: ' + (f.lights ? f.lightMatch.map(function (v) { return esc(SVP.VECTORS[v].name); }).join(', ') : 'нет') + '</li>';
+        if (f.doors.length) {
+          h += '<li>Двери (закон 11):<ul>';
+          f.doors.forEach(function (d) {
+            h += '<li>тьма «' + esc(SVP.VECTORS[d.dark].name) + '» открывается светом «' + esc(SVP.VECTORS[d.via].name) + '» (' + esc(d.from) + ' &rarr; ' + esc(d.to) + ')</li>';
+          });
+          h += '</ul></li>';
+        } else h += '<li>Дверей нет: тьмы одного не встречает свет другого</li>';
+        if (f.darkSame) h += '<li>Общая тьма: ' + f.darkSame + '</li>';
+        if (f.leaderSame) h += '<li>Одинаковый руль — оба ведут</li>';
+        if (f.peaksSame) h += '<li>Общие пики (уровень 4): ' + f.peaksSame + '</li>';
+        h += '</ul><button id="bCircle2" class="ghost">Круг для этой пары</button>';
+      }
+      document.getElementById('mres').innerHTML = h;
+      var b2 = document.getElementById('bCircle2');
+      if (b2) b2.addEventListener('click', function () { state.cur = 'circle'; save(); render(); });
+    } catch (e) { showErr('match: ' + (e && e.message ? e.message : e)); }
+  }
+
+  function rCircle() {
+    var h = '<h2>Круг</h2>';
+    h += '<p class="muted">Кто чьи дефициты закрывает. Ваши и партнёрский профили подставлены; можно добавить ещё — по коду в строке.</p>';
+    h += '<textarea id="extra" rows="3" placeholder="по одному коду v1:... в строке"></textarea>';
+    h += '<button id="doCircle" class="primary">Собрать круг</button>';
+    h += '<div id="cres"></div>';
+    app.innerHTML = h;
+    document.getElementById('doCircle').addEventListener('click', doCircle);
+    doCircle();
+  }
+
+  function doCircle() {
+    try {
+      var members = [];
+      function add(code, name) {
+        var m = SVP.decodeProfile(code);
+        if (m) { m.name = m.name || name; members.push(m); }
+      }
+      if (state.ownCode) add(state.ownCode, 'Вы');
+      if (state.partnerCode) add(state.partnerCode, 'Партнёр');
+      var extra = String(document.getElementById('extra').value || '').split(/\s+/);
+      extra.forEach(function (c) {
+        var code = parseCode(c);
+        if (code) add(code, 'Участник ' + (members.length + 1));
+      });
+      var box = document.getElementById('cres');
+      if (!members.length) { box.innerHTML = '<p class="muted">Нет профилей: пройдите анкету или впишите коды.</p>'; return; }
+      var c = SVP.circle(members);
+      var h = '<p class="muted">Покрытие круга: <b>' + c.coverage + '%</b></p>';
+      if (c.matrix.length) {
+        h += '<h3>Закрытые дефициты</h3><ul>';
+        c.matrix.forEach(function (r) {
+          h += '<li>' + esc(r.who) + ': тьма «' + esc(SVP.VECTORS[r.dark].name) + '» закрыта светом «' + esc(SVP.VECTORS[SVP.VECTORS[r.dark].pair].name) + '» у ' + esc(r.closedBy) + '</li>';
+        });
+        h += '</ul>';
+      }
+      if (c.uncovered.length) {
+        h += '<h3>Непокрытые тьмы</h3><ul>';
+        c.uncovered.forEach(function (r) {
+          h += '<li>' + esc(r.who) + ': тьма «' + esc(SVP.VECTORS[r.dark].name) + '» — нужен носитель света «' + esc(SVP.VECTORS[r.missingLight].name) + '»</li>';
+        });
+        h += '</ul>';
+      }
+      var dup = Object.keys(c.duplicates);
+      if (dup.length) {
+        h += '<h3>Дубли — несколько закрывают одно и то же</h3><ul>';
+        dup.forEach(function (x) { h += '<li>тьма «' + esc(SVP.VECTORS[x].name) + '»: ' + esc(c.duplicates[x].join(', ')) + '</li>'; });
+        h += '</ul>';
+      }
+      var conf = Object.keys(c.conflicts);
+      if (conf.length) {
+        h += '<h3>Конфликты руля</h3><ul>';
+        conf.forEach(function (l) { h += '<li>ведущий «' + esc(SVP.VECTORS[l].name) + '»: ' + esc(c.conflicts[l].join(', ')) + '</li>'; });
+        h += '</ul>';
+      }
+      if (!c.matrix.length && !c.uncovered.length && !dup.length && !conf.length) h += '<p class="muted">Тьм нет — круг пуст.</p>';
+      box.innerHTML = h;
+    } catch (e) { showErr('circle: ' + (e && e.message ? e.message : e)); }
+  }
+
+  function updateProg() {
+    var b = null;
+    if (state.cur === 'report' || state.cur === 'match' || state.cur === 'circle') b = 'report';
+    else if (state.cur === 'route') b = (state.routeName === 'red_zone') ? 'red' : 'report';
+    else if (state.cur !== 'welcome') b = byId[state.cur] ? byId[state.cur].block : null;
+    Array.prototype.forEach.call(document.querySelectorAll('#prog span'), function (sp) {
+      sp.className = (sp.getAttribute('data-b') === b) ? 'on' : '';
+    });
+  }
+
+  function render() {
+    updateProg();
+    if (state.cur === 'welcome') rWelcome();
+    else if (state.cur === 'route') rRoute();
+    else if (state.cur === 'report') rReport();
+    else if (state.cur === 'match') rMatch();
+    else if (state.cur === 'circle') rCircle();
+    else rQuestion();
+  }
+
+  try {
+    var q = new URLSearchParams(location.search).get('q');
+    if (q) {
+      var pc = parseCode(q);
+      if (pc) { state.partnerCode = pc; state.cur = 'match'; }
+    }
+  } catch (e) {}
+  render();
+})();
+</script>
 </body>
 </html>
