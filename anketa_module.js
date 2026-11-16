@@ -170,9 +170,10 @@ function decodeProfile(code) {
 function selfTest() {
   const out = [];
   try {
-    const r = buildReport(DEMO_ANSWERS);
+    const demo = JSON.parse(DEMO_ANSWERS);
+    const r = buildReport(demo);
     out.push([r === EXPECTED_REPORT, "buildReport: отчёт слово в слово совпадает с эталоном"]);
-    const p = deriveProfile(DEMO_ANSWERS);
+    const p = deriveProfile(demo);
     out.push([encodeProfile(p) === "v1:13313123:01101000:2",
       "deriveProfile: демо-профиль " + encodeProfile(p)]);
     const back = decodeProfile(encodeProfile(p));
@@ -187,6 +188,7 @@ function selfTest() {
   }
   return { ok: out.every(x => x[0]), checks: out };
 }
+
 
 /* Демо-ответы (эталон из пакета) и эталонный отчёт — для самотеста */
 const DEMO_ANSWERS = "{\"rz1\":\"Нет\",\"rz2\":\"Нет\",\"rz3\":\"Нет\",\"a1\":\"yes\",\"a2\":\"frozen\",\"a3\":\"years\",\"a4\":\"same\",\"my1\":\"rarely\",\"my2\":\"rarely\",\"ko1\":\"often\",\"ko2\":\"sometimes\",\"an1\":\"often\",\"an2\":\"often\",\"ur1\":\"sometimes\",\"ur2\":\"has\",\"ob1\":\"often\",\"ob2\":\"sometimes\",\"or1\":\"rarely\",\"or2\":\"normal\",\"zv1\":\"sometimes\",\"zv2\":\"rarely\",\"zr1\":\"sometimes\",\"zr2\":\"rarely\",\"zr3\":\"sometimes\",\"st1\":\"same\",\"st2\":\"same\",\"st3\":\"no\",\"st4\":\"was\"}";
