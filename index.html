@@ -3,453 +3,494 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Карта состояния — анкета и совместимость</title>
+<title>Карта состояния — матч и круг</title>
 <link rel="icon" href="data:,">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<div id="errbox" hidden></div>
+<div id="err" class="banner err hidden" role="alert"></div>
+<div id="notice" class="banner notice hidden"></div>
 <header>
-  <div class="progress" id="progress">
-    <span data-step="screening">Скрининг</span> — <span data-step="zone">Зона</span> —
-    <span data-step="map">Карта</span> — <span data-step="stage">Стадия</span> — <span data-step="report">Отчёт</span>
-  </div>
+  <nav class="progress" id="progress" aria-label="Прогресс">
+    <span data-step="Скрининг">Скрининг</span><span class="sep">→</span>
+    <span data-step="Зона">Зона</span><span class="sep">→</span>
+    <span data-step="Карта">Карта</span><span class="sep">→</span>
+    <span data-step="Стадия">Стадия</span><span class="sep">→</span>
+    <span data-step="Отчёт">Отчёт</span>
+  </nav>
 </header>
 <main>
+  <section id="scr-welcome" class="card">
+    <h1>Карта вашего состояния</h1>
+    <p id="welcome-text"></p>
+    <ul id="welcome-rules"></ul>
+    <button id="btn-start">Пройти анкету</button>
+    <button id="btn-demo" class="secondary">Демо-прогон</button>
+    <button id="btn-tomatch" class="secondary">У меня есть код — к матчу</button>
+    <button id="btn-tocircle" class="secondary">Режим круга</button>
+  </section>
 
-<section id="s-welcome">
-  <h1></h1>
-  <p class="lead" id="welcome-text"></p>
-  <ul id="welcome-rules"></ul>
-  <button class="btn" id="btn-start">Начать анкету</button>
-  <button class="btn secondary" id="btn-demo">Демо-прогон</button>
-</section>
+  <section id="scr-quiz" class="card hidden">
+    <h2 id="q-block"></h2>
+    <p id="q-text" class="qtext"></p>
+    <div id="q-options"></div>
+    <details id="q-help" class="hidden"><summary>Как это выглядит в жизни</summary><div id="q-help-body"></div></details>
+    <p id="q-hint" class="hint"></p>
+    <button id="btn-quiz-restart" class="linkbtn">Пройти заново</button>
+  </section>
 
-<section id="s-question" hidden>
-  <div class="qnum" id="q-num"></div>
-  <h2 id="q-title"></h2>
-  <div id="q-help" class="help" hidden>
-    <div class="help-title" id="q-help-title"></div>
-    <ul id="q-help-list"></ul>
-  </div>
-  <button class="linklike" id="q-help-btn">Как это выглядит в жизни</button>
-  <p class="hint" id="q-hint"></p>
-  <div id="q-options"></div>
-</section>
+  <section id="scr-stop" class="card hidden">
+    <h2 id="stop-title"></h2>
+    <p id="stop-text"></p>
+    <div id="stop-extra"></div>
+    <button id="btn-stop-next" class="hidden">Открыть отчёт</button>
+    <button id="btn-stop-restart" class="secondary">Пройти заново</button>
+  </section>
 
-<section id="s-branch" hidden>
-  <h2 id="branch-title"></h2>
-  <p id="branch-message"></p>
-  <div id="branch-extra"></div>
-  <button class="btn" id="btn-branch-next">Дальше</button>
-</section>
+  <section id="scr-report" class="card hidden">
+    <h2>Личный отчёт</h2>
+    <pre id="report-text"></pre>
+    <h3>Чек-лист действий — отметки сохраняются на устройстве</h3>
+    <div id="actions"></div>
+    <p>Ваш код профиля: <code id="my-code"></code></p>
+    <button id="btn-copy-code">Скопировать код</button>
+    <button id="btn-go-match">К матчу</button>
+    <button id="btn-go-circle" class="secondary">Режим круга</button>
+    <button id="btn-restart" class="secondary">Пройти заново</button>
+  </section>
 
-<section id="s-redzone" hidden>
-  <h2>Красная зона</h2>
-  <p id="redzone-message"></p>
-  <div class="danger-card">
-    <p>Это не состояние для карты — это состояние для живого специалиста.
-    Если тяжело сейчас — позвоните. Это бесплатно и анонимно:</p>
-    <a class="btn call" href="tel:88002000122">8-800-2000-122 — всероссийский телефон доверия</a>
-    <p class="note">Круглосуточно, бесплатно. В экстренной ситуации — 112.</p>
-  </div>
-  <p class="note">Анкета остановлена. Вернуться к карте можно позже, когда будете готовы.</p>
-</section>
+  <section id="scr-match" class="card hidden">
+    <h2>Матч</h2>
+    <p>Свой код уже рассчитан из ваших ответов; можно также вписать его вручную. Код партнёра — или его ссылка с <code>?q=</code>.</p>
+    <label for="own-code">Ваш код</label>
+    <input id="own-code" placeholder="v1:00000000:00000000:0" autocomplete="off">
+    <label for="partner-code">Код партнёра</label>
+    <input id="partner-code" placeholder="v1:00000000:00000000:0" autocomplete="off">
+    <button id="btn-match">Считать матч</button>
+    <div id="match-out"></div>
+    <button id="btn-back-report" class="secondary">К отчёту</button>
+  </section>
 
-<section id="s-lightroute" hidden>
-  <h2>Свет-маршрут</h2>
-  <p id="light-message"></p>
-  <div id="light-paths"></div>
-  <button class="btn" id="btn-light-next">Дальше</button>
-</section>
-
-<section id="s-report" hidden>
-  <h2>Ваш отчёт</h2>
-  <pre id="report-text"></pre>
-  <h3>Чек-лист действий (КУДА)</h3>
-  <ul id="actions-list" class="checklist"></ul>
-  <h3>Ваш код профиля</h3>
-  <div class="codebox"><code id="my-code"></code></div>
-  <button class="btn secondary" id="btn-copy">Скопировать код</button>
-  <button class="btn" id="btn-to-match">К матчу с партнёром</button>
-  <button class="btn secondary" id="btn-to-circle">Режим «круга»</button>
-</section>
-
-<section id="s-match" hidden>
-  <h2>Матч</h2>
-  <p>Вставьте код профиля партнёра или его ссылку (с <code>?q=</code>). Ваш код — из отчёта; его можно править и в поле ниже.</p>
-  <label for="inp-my">Мой код</label>
-  <input id="inp-my" type="text" placeholder="v1:...">
-  <label for="inp-partner">Код партнёра</label>
-  <input id="inp-partner" type="text" placeholder="v1:...">
-  <button class="btn" id="btn-match">Считать матч</button>
-  <div id="match-result"></div>
-</section>
-
-<section id="s-circle" hidden>
-  <h2>Круг</h2>
-  <p>Коды участников круга — по одному в строке. Пустой код (<code>v1:e</code>) считается «картой без данных».</p>
-  <textarea id="inp-circle" rows="5" placeholder="v1:...&#10;v1:..."></textarea>
-  <button class="btn" id="btn-circle">Считать круг</button>
-  <div id="circle-result"></div>
-</section>
-
+  <section id="scr-circle" class="card hidden">
+    <h2>Режим круга</h2>
+    <p>Вставьте коды участников — по одному в строке. Свой код добавится сам, если анкета пройдена.</p>
+    <textarea id="circle-codes" rows="5" placeholder="v1:00000000:00000000:0&#10;v1:11111111:00000000:1"></textarea>
+    <button id="btn-circle">Собрать круг</button>
+    <div id="circle-out"></div>
+    <button id="btn-circle-back" class="secondary">Назад</button>
+  </section>
 </main>
+<footer>Карта — навигатор, не диагноз. Ответы обрабатываются на вашем устройстве и не покидают его.</footer>
 <script src="compatibility_module.js"></script>
 <script src="anketa_module.js"></script>
 <script>
-'use strict';
 (function () {
+  'use strict';
+  var DEMO = {"rz1": "Нет", "rz2": "Нет", "rz3": "Нет", "a1": "yes", "a2": "frozen", "a3": "years", "a4": "same", "my1": "rarely", "my2": "rarely", "ko1": "often", "ko2": "sometimes", "an1": "often", "an2": "often", "ur1": "sometimes", "ur2": "has", "ob1": "often", "ob2": "sometimes", "or1": "rarely", "or2": "normal", "zv1": "sometimes", "zv2": "rarely", "zr1": "sometimes", "zr2": "rarely", "zr3": "sometimes", "st1": "same", "st2": "same", "st3": "no", "st4": "was"};
+
   var $ = function (id) { return document.getElementById(id); };
+  var SECTIONS = ['scr-welcome', 'scr-quiz', 'scr-stop', 'scr-report', 'scr-match', 'scr-circle'];
 
-  /* --- видимые ошибки вместо молчаливых падений --- */
   function showErr(msg) {
-    var b = $('errbox');
-    b.textContent = 'Ошибка: ' + msg;
-    b.hidden = false;
-  }
-  window.addEventListener('error', function (e) {
-    showErr((e && e.message) ? e.message : 'сбой скрипта');
-  });
-  function on(id, fn) {
-    var el = $(id);
-    if (!el) { showErr('нет элемента #' + id); return; }
-    el.addEventListener('click', fn);
-  }
-
-  var SECTIONS = ['s-welcome','s-question','s-branch','s-redzone','s-lightroute','s-report','s-match','s-circle'];
-  function show(id) {
-    SECTIONS.forEach(function (s) { if ($(s)) $(s).hidden = (s !== id); });
+    var e = $('err');
+    e.textContent = 'Ошибка: ' + msg;
+    e.classList.remove('hidden');
     window.scrollTo(0, 0);
   }
-  function setStep(step) {
-    var steps = { screening: 0, zone: 1, map: 2, stage: 3, report: 4 };
-    var keys = ['screening','zone','map','stage','report'];
-    var at = steps[step]; if (at === undefined) at = 0;
-    keys.forEach(function (k, i) {
-      var el = document.querySelector('[data-step="' + k + '"]');
-      if (el) el.classList.toggle('active', i <= at);
+  function showNotice(msg) {
+    var n = $('notice');
+    n.textContent = msg;
+    n.classList.remove('hidden');
+  }
+  function clearNotices() {
+    $('err').classList.add('hidden');
+    $('notice').classList.add('hidden');
+  }
+  function on(id, ev, fn) {
+    var el = $(id);
+    if (!el) { showErr('в разметке нет элемента #' + id); return; }
+    el.addEventListener(ev, fn);
+  }
+  function show(id) {
+    SECTIONS.forEach(function (s) { $(s).classList.toggle('hidden', s !== id); });
+    window.scrollTo(0, 0);
+  }
+  function setStep(name) {
+    var order = ['Скрининг', 'Зона', 'Карта', 'Стадия', 'Отчёт'];
+    var active = false;
+    document.querySelectorAll('#progress [data-step]').forEach(function (sp) {
+      if (sp.getAttribute('data-step') === name) active = true;
+      sp.classList.toggle('done', active);
+      sp.classList.toggle('current', sp.getAttribute('data-step') === name);
     });
   }
 
-  var ANSWERS = {};
-
-  /* --- приветствие --- */
+  /* ---------- Приветствие ---------- */
   (function initWelcome() {
-    var w = ANKETA_CONFIG.welcome;
-    var h = $('s-welcome').querySelector('h1');
-    if (h) h.textContent = w.title;
+    var w = Anketa.CONFIG.welcome;
     $('welcome-text').textContent = w.text;
     var ul = $('welcome-rules');
-    ul.innerHTML = '';
     w.rules.forEach(function (r) {
-      var li = document.createElement('li'); li.textContent = r; ul.appendChild(li);
+      var li = document.createElement('li');
+      li.textContent = r;
+      ul.appendChild(li);
     });
   })();
 
-  on('btn-start', function () { ANSWERS = {}; showScreen(0); });
-  on('btn-demo', function () {
-    try {
-      ANSWERS = JSON.parse(DEMO_ANSWERS);
-      goReport();
-    } catch (e) { showErr('демо-ответы не читаются: ' + e.message); }
-  });
+  /* ---------- Анкета ---------- */
+  var screens = Anketa.CONFIG.screens;
+  var BLOCK_STEP = { red: 'Скрининг', law2: 'Зона', vector: 'Карта', stage: 'Стадия' };
+  var BLOCK_NAME = { red: 'Скрининг зоны', law2: 'Закон двух вопросов', vector: 'Карта векторов', stage: 'Стадия' };
+  var answers = {}, idx = 0, stopped = null, pendingStopText = null;
 
-  /* --- анкета: экраны и ветвления --- */
-  var SCREENS = ANKETA_CONFIG.screens;
-  var BLOCK_STEP = { red: 'screening', law2: 'zone', vector: 'map', stage: 'stage' };
-  var qIndex = 0;
-
-  function blockOf(i) { return SCREENS[i].block; }
-  function stepFor(i) { return BLOCK_STEP[blockOf(i)] || 'map'; }
-
-  function showScreen(i) {
-    qIndex = i;
-    var sc = SCREENS[i];
-    setStep(stepFor(i));
-    $('q-num').textContent = 'Вопрос ' + (i + 1) + ' из ' + SCREENS.length;
-    $('q-title').textContent = sc.question;
-    $('q-hint').textContent = sc.hint || '';
-    $('q-hint').hidden = !sc.hint;
-    var hb = $('q-help-btn');
-    hb.hidden = !sc.help;
-    if (sc.help) {
-      $('q-help-title').textContent = sc.help.title || 'Как это выглядит в жизни';
-      var hl = $('q-help-list'); hl.innerHTML = '';
-      (sc.help.examples || []).forEach(function (ex) {
-        var li = document.createElement('li');
-        li.textContent = (typeof ex === 'string') ? ex : ((ex.case || '') + ' → ' + (ex.to || ''));
-        hl.appendChild(li);
-      });
-      $('q-help').hidden = true;
-    }
-    var box = $('q-options'); box.innerHTML = '';
-    sc.options.forEach(function (opt) {
+  function startQuiz() {
+    clearNotices();
+    answers = {}; idx = 0; stopped = null; pendingStopText = null;
+    renderQ();
+    show('scr-quiz');
+  }
+  function renderQ() {
+    var s = screens[idx];
+    setStep(BLOCK_STEP[s.block]);
+    $('q-block').textContent = BLOCK_NAME[s.block] || s.block;
+    $('q-text').textContent = s.question;
+    var box = $('q-options');
+    box.innerHTML = '';
+    s.options.forEach(function (op) {
+      var val = typeof op === 'string' ? op : op.v;
+      var label = typeof op === 'string' ? op : op.t;
       var b = document.createElement('button');
-      b.className = 'btn option';
-      b.textContent = (typeof opt === 'string') ? opt : opt.t;
-      b.addEventListener('click', function () {
-        var val = (typeof opt === 'string') ? opt : opt.v;
-        ANSWERS[sc.id] = val;
-        afterAnswer(i);
-      });
+      b.className = 'opt';
+      b.type = 'button';
+      b.textContent = label;
+      b.addEventListener('click', function () { answer(s, val); });
       box.appendChild(b);
     });
-    show('s-question');
+    var help = $('q-help'), body = $('q-help-body');
+    body.innerHTML = '';
+    if (s.help && s.help.examples && s.help.examples.length) {
+      help.classList.remove('hidden');
+      s.help.examples.forEach(function (ex) {
+        if (typeof ex === 'string') {
+          var p = document.createElement('p');
+          p.textContent = ex;
+          body.appendChild(p);
+        } else if (ex && ex.case) {
+          var d = document.createElement('p');
+          d.innerHTML = '';
+          d.appendChild(document.createTextNode(ex.case + ' '));
+          var t = document.createElement('strong');
+          t.textContent = ex.to || '';
+          d.appendChild(t);
+          body.appendChild(d);
+        }
+      });
+    } else {
+      help.classList.add('hidden');
+    }
+    $('q-hint').textContent = s.hint || '';
   }
-
-  on('q-help-btn', function () {
-    var h = $('q-help');
-    if (h) h.hidden = !h.hidden;
-  });
-
-  function branchHit(sc) {
-    // ветвления в порядке приоритета, до первого совпавшего
-    for (var j = 0; j < ANKETA_CONFIG.branches.length; j++) {
-      var b = ANKETA_CONFIG.branches[j];
-      var hit = false;
-      if (b.when === 'tie') {
-        var a = Anketa.analyze(ANSWERS);
-        hit = (a.route !== 'red_zone' && a.route !== 'light' &&
-               a.counts && tieDetected(a.counts));
-      } else if (b.when && b.when.any_of) {
-        hit = b.when.any_of.some(function (kv) {
-          var p = kv.split('=');
-          return ANSWERS[p[0]] === p[1];
-        });
-      } else if (b.when) {
-        hit = Object.keys(b.when).every(function (k) { return ANSWERS[k] === b.when[k]; });
+  function answer(s, val) {
+    answers[s.id] = val;
+    var br = checkBranches();
+    if (br && br.stop) { stopped = br; renderStop(br, null); return; }
+    if (br && !br.stop) showNotice(br.message);
+    idx++;
+    if (idx >= screens.length) { renderReport(); } else { renderQ(); }
+  }
+  function checkBranches() {
+    var list = Anketa.CONFIG.branches || [];
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (typeof b.when === 'string') continue; /* «tie» проверяется в отчёте */
+      var hit = true;
+      for (var key in b.when) {
+        if (key === 'any_of') {
+          hit = b.when[key].some(function (pair) {
+            var pp = pair.split('=');
+            return answers[pp[0]] === pp[1];
+          });
+        } else {
+          hit = (answers[key] === b.when[key]);
+        }
+        if (!hit) break;
       }
       if (hit) return b;
     }
     return null;
   }
-  function tieDetected(counts) {
-    var max = -1, n = 0;
-    SVP.ORDER.forEach(function (v) {
-      if (counts[v] > max) { max = counts[v]; n = 1; }
-      else if (counts[v] === max) n++;
-    });
-    return n > 1;
-  }
-
-  function afterAnswer(i) {
-    var b = branchHit(SCREENS[i]);
-    var next = i + 1;
-    var isLast = next >= SCREENS.length;
-    if (b && b.route === 'red_zone' && b.stop) { showRedzone(b.message); return; }
-    if (b && b.route === 'light' && b.stop) { showLightroute(b.message); return; }
-    if (b && b.message) { showBranch(b.message, isLast); return; }
-    if (isLast) { goReport(); return; }
-    showScreen(next);
-  }
-
-  function showRedzone(message) {
-    $('redzone-message').textContent = message || ANKETA_CONFIG.branches[0].message;
-    setStep('screening');
-    show('s-redzone');
-  }
-  function showLightroute(message) {
-    $('light-message').textContent = message || '';
-    var box = $('light-paths'); box.innerHTML = '';
-    SVP.ORDER.forEach(function (v) {
-      var vec = SVP.VECTORS[v];
-      var d = document.createElement('div');
-      d.className = 'path-card';
-      var h = document.createElement('h4'); h.textContent = vec.name + ' → путь';
-      var p = document.createElement('p'); p.textContent = vec.path;
-      d.appendChild(h); d.appendChild(p); box.appendChild(d);
-    });
-    show('s-lightroute');
-  }
-  on('btn-light-next', function () { goReport(); });
-
-  function showBranch(message, isLast) {
-    $('branch-message').textContent = message;
-    var btn = $('btn-branch-next');
-    btn.textContent = isLast ? 'К отчёту' : 'Дальше';
-    btn.onclick = function () { isLast ? goReport() : showScreen(qIndex + 1); };
-    show('s-branch');
-  }
-
-  /* --- отчёт --- */
-  var MY_CODE = null;
-  function goReport() {
-    try {
-      setStep('report');
-      $('report-text').textContent = Anketa.buildReport(ANSWERS);
-      var prof = Anketa.deriveProfile(ANSWERS);
-      MY_CODE = Anketa.encodeProfile(prof);
-      $('my-code').textContent = MY_CODE;
-      $('inp-my').value = MY_CODE;
-      renderActions(prof);
-      show('s-report');
-    } catch (e) { showErr('отчёт: ' + e.message); }
-  }
-
-  function renderActions(prof) {
-    var vec = Anketa.VECTORS[prof.lead_name];
-    var ul = $('actions-list'); ul.innerHTML = '';
-    var done = JSON.parse(localStorage.getItem('svp_actions') || '[]');
-    (vec.actions || []).forEach(function (a) {
-      var li = document.createElement('li');
-      var cb = document.createElement('input');
-      cb.type = 'checkbox'; cb.checked = done.indexOf(a) >= 0;
-      cb.addEventListener('change', function () {
-        var d = JSON.parse(localStorage.getItem('svp_actions') || '[]');
-        if (cb.checked) { if (d.indexOf(a) < 0) d.push(a); }
-        else { d = d.filter(function (x) { return x !== a; }); }
-        localStorage.setItem('svp_actions', JSON.stringify(d));
-      });
-      li.appendChild(cb);
-      var span = document.createElement('span'); span.textContent = ' ' + a;
-      li.appendChild(span);
-      ul.appendChild(li);
-    });
-  }
-
-  on('btn-copy', function () {
-    var code = $('inp-my').value || MY_CODE || '';
-    if (navigator.clipboard && navigator.clipboard.writeText) {
-      navigator.clipboard.writeText(code);
+  function renderStop(br) {
+    setStep('Отчёт');
+    if (br.route === 'red_zone') {
+      $('stop-title').textContent = 'Красная зона';
+      $('stop-text').textContent = br.message;
+      var extra = $('stop-extra');
+      extra.innerHTML = '';
+      var p1 = document.createElement('p');
+      var a = document.createElement('a');
+      a.href = 'tel:88002000122';
+      a.textContent = '8 800 2000-122';
+      p1.appendChild(document.createTextNode('Телефон доверия (бесплатно, круглосуточно): '));
+      p1.appendChild(a);
+      extra.appendChild(p1);
+      var p2 = document.createElement('p');
+      p2.textContent = 'В экстренной ситуации — 112.';
+      extra.appendChild(p2);
+      $('btn-stop-next').classList.add('hidden');
+    } else if (br.route === 'light') {
+      $('stop-title').textContent = 'Свет-маршрут';
+      $('stop-text').textContent = br.message;
+      $('stop-extra').innerHTML = '';
+      $('btn-stop-next').classList.remove('hidden');
+      pendingStopText = Anketa.buildReport(answers);
     } else {
-      var r = document.createRange(); r.selectNodeContents($('my-code'));
-      var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(r);
+      $('stop-title').textContent = 'Маршрут определён';
+      $('stop-text').textContent = br.message;
+      $('stop-extra').innerHTML = '';
+      $('btn-stop-next').classList.remove('hidden');
+      pendingStopText = null;
+      return; /* не сворачиваем анкету: продолжаем */
     }
-  });
-  on('btn-to-match', function () {
-    $('inp-my').value = $('inp-my').value || MY_CODE || '';
-    show('s-match');
-  });
-  on('btn-to-circle', function () {
-    var ta = $('inp-circle');
-    if (MY_CODE && !ta.value) ta.value = MY_CODE;
-    show('s-circle');
-  });
-
-  /* --- разбор ссылки с ?q= --- */
-  function extractCode(s) {
-    s = String(s || '').trim();
-    if (!s) return '';
-    var m = s.match(/[?&]q=([^&\s]+)/);
-    if (m) s = decodeURIComponent(m[1]);
-    s = s.replace(/\s+/g, '');
-    return s;
+    show('scr-stop');
   }
 
-  /* --- матч --- */
-  on('btn-match', function () {
-    try {
-      var box = $('match-result'); box.innerHTML = '';
-      var a = SVP.decodeProfile(extractCode($('inp-my').value));
-      var b = SVP.decodeProfile(extractCode($('inp-partner').value));
-      if (!a || !b) {
-        box.innerHTML = '<p class="err">Код не распознан. Формат: v1:12345678:01010101:2 — уровни (8 цифр 0–4), тьмы (8 цифр 0–1), индекс ведущего 0–7. Пустая карта: v1:e</p>';
-        return;
-      }
-      var modes = [['partners','Партнёры'],['business','Бизнес'],['friends','Друзья']];
-      var html = '<div class="score-row">';
-      modes.forEach(function (mm) {
-        var r = SVP.match(a, b, mm[0]);
-        html += '<div class="score"><div class="score-num">' + r.score + '</div><div class="score-label">' + mm[1] + '</div></div>';
+  /* ---------- Отчёт ---------- */
+  function lsKey(v) { return 'svp_actions_' + v; }
+  function renderReport() {
+    clearNotices();
+    setStep('Отчёт');
+    var res = Anketa.analyze(answers);
+    var text = Anketa.buildReport(answers);
+    if (pendingStopText) text = pendingStopText;
+    $('report-text').textContent = text;
+
+    var box = $('actions');
+    box.innerHTML = '';
+    var v = Anketa.VECTORS[res.leading];
+    if (v && v.actions && res.route !== 'red_zone' && res.route !== 'light') {
+      var saved = {};
+      try { saved = JSON.parse(localStorage.getItem(lsKey(res.leading)) || '{}'); } catch (e) { saved = {}; }
+      v.actions.forEach(function (act, i) {
+        var id = 'act_' + i;
+        var label = document.createElement('label');
+        label.className = 'check';
+        var cb = document.createElement('input');
+        cb.type = 'checkbox';
+        cb.checked = !!saved[i];
+        cb.addEventListener('change', function () {
+          saved[i] = cb.checked;
+          try { localStorage.setItem(lsKey(res.leading), JSON.stringify(saved)); } catch (e2) {}
+        });
+        label.appendChild(cb);
+        label.appendChild(document.createTextNode(' ' + act));
+        box.appendChild(label);
       });
-      html += '</div>';
-      html += '<h3>Разбор</h3>';
-      if (a.empty || b.empty) {
-        html += '<p>Одна из карт пуста — «карта без данных». Пройдите анкету, чтобы получить полный матч.</p>';
+    }
+    var prof = Anketa.deriveProfile(answers);
+    var code = Anketa.encodeProfile(prof);
+    $('my-code').textContent = code;
+    var tie = checkTie(res);
+    if (tie) showNotice(tie);
+    show('scr-report');
+  }
+  function checkTie(res) {
+    if (!res || !res.counts) return null;
+    var best = -1, winners = [];
+    Anketa.ORDER.forEach(function (v) {
+      if (res.counts[v] > best) { best = res.counts[v]; winners = [v]; }
+      else if (res.counts[v] === best) winners.push(v);
+    });
+    if (winners.length > 1) {
+      return 'Счёт ведущих векторов ничейный (' + winners.join(' / ') + ') — тай-брейк по телесному маркеру (вопрос о том, нарастает ли он).';
+    }
+    return null;
+  }
+
+  /* ---------- Разбор кода ---------- */
+  function parseCode(raw) {
+    if (!raw) return null;
+    var s = String(raw);
+    var m = /[?&]q=(v1:[^&\s]+)/.exec(s);
+    if (m) s = m[1];
+    s = s.trim();
+    var p = SVP.decodeProfile(s);
+    if (p && !p.empty) return p;
+    return null;
+  }
+
+  /* ---------- Матч ---------- */
+  function renderMatch() {
+    clearNotices();
+    var a = parseCode($('own-code').value);
+    var b = parseCode($('partner-code').value);
+    if (!a || !b) {
+      showErr('код не распознан. Формат: v1:LLLLLLLL:DDDDDDDD:L — восемь цифр уровней, восемь цифр тьмы, индекс ведущего; либо ссылка с ?q=.');
+      return;
+    }
+    var modes = [['partners', 'Партнёры'], ['business', 'Бизнес'], ['friends', 'Друзья']];
+    var out = '';
+    modes.forEach(function (mm) {
+      var r = SVP.match(a, b, mm[0]);
+      out += '<div class="score"><div class="score-head">' + mm[1] + '</div>' +
+             '<div class="bar"><div class="fill" style="width:' + r.score + '%"></div></div>' +
+             '<div class="score-num">' + r.score + '</div></div>';
+    });
+    var f = SVP.match(a, b, 'partners').f;
+    if (f) {
+      out += '<details class="breakdown"><summary>Разбор</summary><ul>';
+      if (f.doorsSum) {
+        f.doors.forEach(function (d) {
+          out += '<li>Дверь: тьма «' + SVP.VECTORS[d.dark].name + '» открывается светом «' + SVP.VECTORS[d.via].name + '» (' + (d.from || '—') + ' → ' + (d.to || '—') + ')</li>';
+        });
       } else {
-        var f = SVP.match(a, b, 'partners').f;
-        html += '<ul>';
-        html += '<li>Совпадение света: ' + (f.lights ? f.lightMatch.map(function (v) { return Anketa.VECTORS[v].name; }).join(', ') : 'нет') + '</li>';
-        if (f.doorsSum) {
-          html += '<li>Двери (закон 11): ' + f.doors.map(function (d) {
-            return Anketa.VECTORS[d.dark].name + ' ← через ' + Anketa.VECTORS[d.via].name + ' (' + d.from + ' → ' + d.to + ')';
-          }).join('; ') + '</li>';
-        } else {
-          html += '<li>Дверей нет: тьмы одного не закрыты светом другого</li>';
-        }
-        html += '<li>Общая тьма: ' + (f.darkSame || 'нет') + '</li>';
-        html += '<li>Руль: ' + (f.leaderSame ? 'у обоих один — конкуренция за руль' : 'разный — хорошо для пары') + '</li>';
-        if (f.peaksSame) html += '<li>Общие пики (уровень 4): ' + f.peaksSame + '</li>';
-        html += '</ul>';
+        out += '<li>Дверей нет: ваши тьмы не встречают чужой свет</li>';
       }
-      box.innerHTML = html;
-    } catch (e) { showErr('матч: ' + e.message); }
-  });
+      out += '<li>Совпавший свет: ' + (f.lightMatch.length ? f.lightMatch.map(function (v) { return SVP.VECTORS[v].name; }).join(', ') : 'нет') + '</li>';
+      out += '<li>Общая тьма: ' + f.darkSame + '</li>';
+      out += '<li>Одинаковый руль: ' + (f.leaderSame ? 'да — вычитается из пары и бизнеса' : 'нет') + '</li>';
+      out += '<li>Совпадение пиков (уровень 4): ' + f.peaksSame + '</li>';
+      out += '</ul></details>';
+    }
+    $('match-out').innerHTML = out;
+    show('scr-match');
+  }
 
-  /* --- круг --- */
-  on('btn-circle', function () {
-    try {
-      var box = $('circle-result'); box.innerHTML = '';
-      var lines = $('inp-circle').value.split('\n')
-        .map(extractCode).filter(function (s) { return s; });
-      if (!lines.length) { box.innerHTML = '<p class="err">Вставьте хотя бы один код.</p>'; return; }
-      var members = [];
-      lines.forEach(function (c, i) {
-        var p = SVP.decodeProfile(c);
-        if (!p) throw new Error('строка ' + (i + 1) + ': код не распознан');
-        p.name = p.name || ('Участник ' + (i + 1));
-        members.push(p);
+  /* ---------- Круг ---------- */
+  function renderCircle() {
+    clearNotices();
+    var lines = $('circle-codes').value.split(/\n+/).map(function (x) { return x.trim(); }).filter(Boolean);
+    var members = [];
+    var bad = [];
+    lines.forEach(function (l, i) {
+      var p = parseCode(l);
+      if (!p) { bad.push(i + 1); return; }
+      p.name = 'Участник ' + (members.length + 1);
+      members.push(p);
+    });
+    if (bad.length) { showErr('строки не распознаны: ' + bad.join(', ')); return; }
+    if (members.length < 2) { showErr('нужно минимум два профиля'); return; }
+    var c = SVP.circle(members);
+    var out = '<p><strong>Покрытие дефицитов: ' + c.coverage + '%</strong></p>';
+    out += '<table><thead><tr><th>Кто</th><th>Тьма</th><th>Закрывает</th></tr></thead><tbody>';
+    c.matrix.forEach(function (r) {
+      out += '<tr><td>' + r.who + '</td><td>' + SVP.VECTORS[r.dark].name + '</td><td>' + r.closedBy + '</td></tr>';
+    });
+    out += '</tbody></table>';
+    if (c.uncovered.length) {
+      out += '<h3>Непокрытые дефициты</h3><ul>';
+      c.uncovered.forEach(function (u) {
+        out += '<li>' + u.who + ': тьма «' + SVP.VECTORS[u.dark].name + '» — нужен свет «' + SVP.VECTORS[u.missingLight].name + '»</li>';
       });
-      var c = SVP.circle(members);
-      var html = '<p>Покрытие дефицитов: <strong>' + c.coverage + '%</strong></p>';
-      if (c.matrix.length) {
-        html += '<h3>Кто чьи дефициты закрывает</h3><ul>';
-        c.matrix.forEach(function (m) {
-          html += '<li>' + m.who + ': тьма ' + Anketa.VECTORS[m.dark].name + ' — закрыта светом ' + m.closedBy + ' (через ' + Anketa.VECTORS[Anketa.VECTORS[m.dark].pair].name + ')</li>';
-        });
-        html += '</ul>';
-      }
-      if (c.uncovered.length) {
-        html += '<h3>Непокрытые дефициты</h3><ul>';
-        c.uncovered.forEach(function (m) {
-          html += '<li>' + m.who + ': тьма ' + Anketa.VECTORS[m.dark].name + ' — нужен носитель света ' + Anketa.VECTORS[m.missingLight].name + '</li>';
-        });
-        html += '</ul>';
-      }
-      var dupKeys = Object.keys(c.duplicates);
-      if (dupKeys.length) {
-        html += '<h3>Дубли (закрывают одно и то же)</h3><ul>';
-        dupKeys.forEach(function (k) {
-          html += '<li>' + Anketa.VECTORS[k].name + ': ' + c.duplicates[k].join(', ') + '</li>';
-        });
-        html += '</ul>';
-      }
-      var confKeys = Object.keys(c.conflicts);
-      if (confKeys.length) {
-        html += '<h3>Конфликты руля</h3><ul>';
-        confKeys.forEach(function (k) {
-          html += '<li>' + Anketa.VECTORS[k].name + ': ' + c.conflicts[k].join(', ') + '</li>';
-        });
-        html += '</ul>';
-      }
-      box.innerHTML = html;
-    } catch (e) { showErr('круг: ' + e.message); }
-  });
+      out += '</ul>';
+    } else {
+      out += '<p>Непокрытых дефицитов нет.</p>';
+    }
+    var dupKeys = Object.keys(c.duplicates);
+    if (dupKeys.length) {
+      out += '<h3>Дубли (один свет закрывает несколько раз)</h3><ul>';
+      dupKeys.forEach(function (k) {
+        out += '<li>' + SVP.VECTORS[k].name + ': ' + c.duplicates[k].join(', ') + '</li>';
+      });
+      out += '</ul>';
+    }
+    var confKeys = Object.keys(c.conflicts);
+    if (confKeys.length) {
+      out += '<h3>Конфликты руля</h3><ul>';
+      confKeys.forEach(function (k) {
+        out += '<li>' + SVP.VECTORS[k].name + ': ' + c.conflicts[k].join(', ') + '</li>';
+      });
+      out += '</ul>';
+    } else {
+      out += '<p>Конфликтов руля нет.</p>';
+    }
+    $('circle-out').innerHTML = out;
+  }
 
-  /* --- автоподстановка кода из ссылки ?q= --- */
+  /* ---------- Копирование ---------- */
+  function copyCode() {
+    var code = $('my-code').textContent;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(code).then(function () {
+        showNotice('Код скопирован: ' + code);
+      }, function () { showNotice('Код: ' + code); });
+    } else {
+      showNotice('Код: ' + code);
+    }
+  }
+
+  /* ---------- Навигация ---------- */
+  on('btn-start', 'click', startQuiz);
+  on('btn-demo', 'click', function () {
+    answers = {}; for (var k in DEMO) answers[k] = DEMO[k];
+    idx = screens.length; stopped = null; pendingStopText = null;
+    renderReport();
+  });
+  on('btn-tomatch', 'click', function () {
+    if (!answers || !Object.keys(answers).length) {
+      $('own-code').value = '';
+    } else {
+      $('own-code').value = Anketa.encodeProfile(Anketa.deriveProfile(answers));
+    }
+    renderMatchScreen();
+  });
+  on('btn-tocircle', 'click', openCircle);
+  on('btn-quiz-restart', 'click', startQuiz);
+  on('btn-stop-restart', 'click', startQuiz);
+  on('btn-stop-next', 'click', function () {
+    if (pendingStopText) { renderReport(); } else { startQuiz(); }
+  });
+  on('btn-copy-code', 'click', copyCode);
+  on('btn-go-match', 'click', function () {
+    $('own-code').value = Anketa.encodeProfile(Anketa.deriveProfile(answers));
+    renderMatchScreen();
+  });
+  on('btn-go-circle', 'click', openCircle);
+  on('btn-restart', 'click', startQuiz);
+  on('btn-back-report', 'click', function () { show('scr-report'); });
+  on('btn-circle-back', 'click', function () { show('scr-welcome'); });
+  on('btn-match', 'click', renderMatch);
+  on('btn-circle', 'click', renderCircle);
+
+  function renderMatchScreen() {
+    clearNotices();
+    var q = null;
+    try { q = new URLSearchParams(window.location.search).get('q'); } catch (e) {}
+    if (q) $('partner-code').value = q;
+    show('scr-match');
+  }
+  function openCircle() {
+    clearNotices();
+    var ta = $('circle-codes');
+    var mine = (answers && Object.keys(answers).length)
+      ? Anketa.encodeProfile(Anketa.deriveProfile(answers)) : '';
+    if (mine && ta.value.indexOf(mine) < 0) {
+      ta.value = mine + (ta.value.trim() ? '\n' + ta.value.trim() : '');
+    }
+    show('scr-circle');
+  }
+
+  /* ---------- Ссылка ?q= ---------- */
   (function initFromUrl() {
-    var q = new URLSearchParams(location.search).get('q');
+    var q = null;
+    try { q = new URLSearchParams(window.location.search).get('q'); } catch (e) {}
     if (q) {
-      ANSWERS = ANSWERS || {};
-      $('inp-partner').value = q;
-      show('s-match');
-      var my = localStorage.getItem('svp_my_code');
-      if (my) { $('inp-my').value = my; }
-      setStep('report');
+      $('partner-code').value = q;
+      showNotice('Обнаружен код партнёра в ссылке: ' + q + '. Пройдите анкету или введите свой код — матч готов.');
     }
   })();
 
-  /* --- самотесты при загрузке: тихо при успехе, видно при провале --- */
-  try {
-    var st1 = SVP.selfTest();
-    if (!st1.passed) showErr('движок: ' + st1.failed.join('; '));
-    (Anketa.selfTest() || []).forEach(function (pair) {
-      if (!pair[0]) showErr('анкета: ' + pair[1]);
-    });
-  } catch (e) { showErr('самотест: ' + e.message); }
-
-  show('s-welcome');
+  /* ---------- Самотесты при загрузке ---------- */
+  (function selfTests() {
+    var st = SVP.selfTest();
+    if (!st.passed) showErr('самотест движка: ' + st.failed.join('; '));
+    try {
+      Anketa.selfTest().forEach(function (pair) {
+        if (!pair[0]) showErr('самотест анкеты: ' + (pair[1] || 'не пройден'));
+      });
+    } catch (e) {
+      showErr('самотест анкеты упал: ' + e.message);
+    }
+  })();
 })();
 </script>
 </body>
