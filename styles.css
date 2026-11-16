@@ -1,30 +1,69 @@
-:root{--bg:#121212;--fg:#e8e6e1;--mut:#9a958c;--acc:#e0a458;--card:#1c1b19;--line:#2a2926}
-*{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--fg);font:16px/1.55 -apple-system,'Segoe UI',Roboto,sans-serif;padding:0 16px 60px}
-#err{background:#3a1214;border:1px solid #7a2a2e;color:#f3c1c3;padding:10px 14px;margin:12px 0;border-radius:8px;font-size:14px}
-#prog{display:flex;gap:14px;padding:14px 0;font-size:13px;color:var(--mut);border-bottom:1px solid var(--line)}
-#prog span.on{color:var(--acc);border-bottom:2px solid var(--acc)}
-h1{font-size:26px;margin:20px 0 8px}
-h2{font-size:21px;margin:22px 0 8px}
-h3{font-size:16px;margin:18px 0 6px}
-button,.opt,a.hotline{display:block;width:100%;padding:14px;margin:10px 0;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:17px;cursor:pointer;text-align:center;text-decoration:none}
-.primary{background:var(--acc);color:#141310;border:none;font-weight:600}
-.ghost{background:transparent;color:var(--mut)}
-.opt{text-align:left;padding:13px 16px}
-.opt:active{border-color:var(--acc)}
-input,textarea{width:100%;padding:12px;margin:6px 0 12px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--fg);font-size:16px}
-label{display:block;margin-top:10px;font-size:14px;color:var(--mut)}
-details.help{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;margin:12px 0}
-details.help summary{cursor:pointer;color:var(--acc)}
-.hint{color:var(--mut);font-size:14px}
-.muted{color:var(--mut);font-size:14px}
-.notice{background:#242017;border-left:3px solid var(--acc);padding:10px 12px;border-radius:6px;margin:10px 0;font-size:14px}
-.code{background:var(--card);border:1px solid var(--line);padding:10px 14px;border-radius:10px;margin:12px 0;word-break:break-all}
-.report{white-space:pre-wrap;background:var(--card);border:1px solid var(--line);padding:14px;border-radius:10px;margin:12px 0;font-size:15px}
-.score{display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px solid var(--line);padding:14px;border-radius:10px;margin:8px 0}
-.score b{font-size:24px;color:var(--acc)}
-.row{display:flex;gap:8px}
-.row button{flex:1;padding:12px 6px;font-size:14px}
-ul{margin:8px 0;padding-left:20px}
-li{margin:6px 0}
-.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--acc);color:#141310;padding:8px 18px;border-radius:20px;font-size:14px;z-index:9}
+:root {
+  --bg: #14161c; --card: #1d2029; --text: #e8e6e1; --muted: #9a97a0;
+  --accent: #e8b464; --danger: #d46a6a; --ok: #7fbf8e; --line: #2c2f3a;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; background: var(--bg); color: var(--text);
+  font: 17px/1.55 -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+}
+main { max-width: 720px; margin: 0 auto; padding: 20px 16px 60px; }
+header { max-width: 720px; margin: 0 auto; padding: 14px 16px 0; }
+.progress { color: var(--muted); font-size: 14px; }
+.progress span.active { color: var(--accent); font-weight: 600; }
+h1 { font-size: 28px; margin: 0.4em 0; }
+h2 { font-size: 22px; margin: 0.6em 0 0.3em; }
+h3 { font-size: 18px; margin: 1.2em 0 0.4em; color: var(--accent); }
+.lead { color: var(--muted); }
+ul { padding-left: 20px; }
+button, .btn {
+  display: block; width: 100%; margin: 10px 0; padding: 15px 18px;
+  font-size: 17px; border-radius: 10px; border: none; cursor: pointer;
+  background: var(--accent); color: #1c1508; font-weight: 600;
+}
+.btn.secondary { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.btn.call { background: var(--danger); color: #fff; text-align: center; text-decoration: none; }
+.btn.option { background: var(--card); color: var(--text); border: 1px solid var(--line); font-weight: 400; text-align: left; }
+.btn.option:active { border-color: var(--accent); }
+.linklike { background: none; border: none; color: var(--muted); text-decoration: underline; padding: 0; width: auto; display: inline; }
+.hint { color: var(--muted); font-size: 15px; font-style: italic; }
+.help { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 10px 0; }
+.help-title { color: var(--accent); font-weight: 600; margin-bottom: 6px; }
+.help li { margin-bottom: 8px; color: var(--muted); }
+.qnum { color: var(--muted); font-size: 14px; }
+.codebox { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; overflow-x: auto; }
+code { color: var(--accent); }
+pre {
+  background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+  padding: 14px 16px; white-space: pre-wrap; overflow-x: auto; font-size: 15px;
+}
+input[type="text"], textarea {
+  width: 100%; background: var(--card); color: var(--text);
+  border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px;
+  font-size: 16px; font-family: inherit; margin: 4px 0 10px;
+}
+label { color: var(--muted); font-size: 14px; }
+#errbox {
+  position: sticky; top: 0; z-index: 10; margin: 0; padding: 10px 16px;
+  background: var(--danger); color: #fff; font-size: 15px;
+}
+.danger-card {
+  background: var(--card); border: 1px solid var(--danger); border-radius: 12px;
+  padding: 16px; margin: 14px 0;
+}
+.note { color: var(--muted); font-size: 14px; }
+.score-row { display: flex; gap: 12px; margin: 14px 0; }
+.score { flex: 1; background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 14px; text-align: center; }
+.score-num { font-size: 34px; font-weight: 700; color: var(--accent); }
+.score-label { color: var(--muted); font-size: 14px; margin-top: 4px; }
+.checklist { list-style: none; padding-left: 0; }
+.checklist li { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 8px 0; }
+.checklist input { width: 18px; height: 18px; vertical-align: middle; margin-right: 8px; }
+.path-card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 10px 0; }
+.path-card h4 { margin: 0 0 4px; color: var(--accent); font-size: 16px; }
+.path-card p { margin: 0; color: var(--muted); font-size: 15px; }
+.err { color: var(--danger); }
+@media (max-width: 480px) {
+  .score-row { flex-direction: column; }
+  h1 { font-size: 24px; }
+}
