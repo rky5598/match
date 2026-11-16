@@ -484,9 +484,12 @@
     var st = SVP.selfTest();
     if (!st.passed) showErr('самотест движка: ' + st.failed.join('; '));
     try {
-      Anketa.selfTest().forEach(function (pair) {
-        if (!pair[0]) showErr('самотест анкеты: ' + (pair[1] || 'не пройден'));
-      });
+      var at = Anketa.selfTest();
+      if (at && at.ok === false && at.checks) {
+        at.checks.forEach(function (pair) {
+          if (!pair[0]) showErr('самотест анкеты: ' + (pair[1] || 'не пройден'));
+        });
+      }
     } catch (e) {
       showErr('самотест анкеты упал: ' + e.message);
     }
