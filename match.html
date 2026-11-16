@@ -3,370 +3,362 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Совместимость по векторам</title>
+<title>Карта состояния</title>
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-<header>
-  <h1>Совместимость по векторам</h1>
-  <p class="legend">Закон 13 — совпадать по свету, дополняться по функции, не совпадать по тьме.
-  Оценка — карта дверей, не приговор.</p>
-  <div id="banner" class="banner">Проверка движка…</div>
-</header>
+<div id="progress" class="progress"></div>
+<div id="test-banner" class="banner" style="display:none"></div>
 
-<main>
-  <!-- ЭКРАН 1: главная -->
-  <section id="screenHome" class="card">
-    <h2>Что это</h2>
-    <p>Один человек создаёт свой профиль и получает <b>ссылку-приглашение</b>.
-    Второй открывает её, видит первый профиль, заполняет свой — и обе стороны
-    получают совместимость: по слоям, с флагами и зеркальными отчётами.
-    Без регистрации и сервера: профиль зашит в ссылку.</p>
-    <button id="btnStart" class="primary" disabled>Создать свой профиль и ссылку</button>
-    <p class="hint">Если пришли по ссылке с параметрами ?p=… — экран матча уже открыт ниже.</p>
+<main class="wrap">
+  <section id="v-welcome">
+    <h1>Карта вашего состояния</h1>
+    <p class="lead">Это не тест и не диагноз. Это навигация: за 12–15 минут вы получите карту своей тьмы — где она копится, на какой ступени стоит — и направление света: что конкретно добавлять. Отвечайте из текущего состояния, не из «как правильно». Правильных ответов здесь нет — есть только честные.</p>
+    <div id="invite-box" class="card" style="display:none">
+      <p id="invite-text"></p>
+    </div>
+    <ul class="rules">
+      <li>Отвечайте про последние месяцы, а не про идеальную версию себя</li>
+      <li>Если сомневаетесь — выбирайте «иногда», а не «почти никогда»</li>
+      <li>Все ответы конфиденциальны и обрабатываются на вашем устройстве</li>
+    </ul>
+    <button id="btn-start" class="btn primary">Начать</button>
+    <button id="btn-demo" class="btn ghost">Демо-прогон</button>
+    <p class="foot">Если вам сейчас плохо и вы в кризисе — телефон доверия <a href="tel:+78002000122">8-800-2000-122</a> — не через анкету.</p>
   </section>
 
-  <!-- ЭКРАН 2: форма профиля (статическая разметка — не собирается скриптом) -->
-  <section id="screenForm" class="card" hidden>
-    <h2 id="formTitle">Ваш профиль</h2>
+  <section id="v-question" style="display:none">
+    <p id="q-block" class="qblock"></p>
+    <h2 id="q-text"></h2>
+    <p id="q-hint" class="hint"></p>
+    <div id="q-opts" class="opts"></div>
+    <button id="q-acc-btn" class="btn ghost acc-btn">Как это выглядит в жизни?</button>
+    <div id="q-acc" class="acc" style="display:none"><div id="q-acc-body"></div></div>
+    <div class="nav"><button id="btn-back" class="btn ghost">Назад</button></div>
+  </section>
 
-    <h3>Уровни векторов (0 — пусто, 4 — вершина)</h3>
-      <div class="vec-row">
-        <div class="vec-label"><b>Уретральный</b><span class="vec-short">поток, бесстрашие, скорость</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-ur" min="0" max="4" step="1" value="0" aria-label="Уровень: Уретральный">
-          <output id="out-ur">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Кожный</b><span class="vec-short">логика, дисциплина, границы</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-ko" min="0" max="4" step="1" value="0" aria-label="Уровень: Кожный">
-          <output id="out-ko">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Анальный</b><span class="vec-short">порядок, память, верность</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-an" min="0" max="4" step="1" value="0" aria-label="Уровень: Анальный">
-          <output id="out-an">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Мышечный</b><span class="vec-short">тело, движение, дом</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-mu" min="0" max="4" step="1" value="0" aria-label="Уровень: Мышечный">
-          <output id="out-mu">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Зрительный</b><span class="vec-short">эмоции, свет, сострадание</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-zr" min="0" max="4" step="1" value="0" aria-label="Уровень: Зрительный">
-          <output id="out-zr">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Оральный</b><span class="vec-short">слово, юмор, ласка</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-or" min="0" max="4" step="1" value="0" aria-label="Уровень: Оральный">
-          <output id="out-or">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Обонятельный</b><span class="vec-short">нюх, опора, оценка людей</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-ob" min="0" max="4" step="1" value="0" aria-label="Уровень: Обонятельный">
-          <output id="out-ob">0</output>
-        </div>
-      </div>
-      <div class="vec-row">
-        <div class="vec-label"><b>Звуковой</b><span class="vec-short">смысл, тишина, глубина</span></div>
-        <div class="vec-controls">
-          <input type="range" id="lvl-zv" min="0" max="4" step="1" value="0" aria-label="Уровень: Звуковой">
-          <output id="out-zv">0</output>
-        </div>
-      </div>
+  <section id="v-redzone" style="display:none">
+    <h2>Красная зона</h2>
+    <p id="rz-msg" class="big"></p>
+    <p>Карта работает только с зоной развиваемых состояний. То, что вы описали, — территория живой помощи: там помогут быстрее и безопаснее любой навигации.</p>
+    <button id="btn-call" class="btn primary">Позвонить: 8-800-2000-122</button>
+    <a class="btn ghost" href="tel:+78002000122">Телефон доверия (круглосуточно, бесплатно)</a>
+    <button id="btn-rz-back" class="btn ghost">На начало</button>
+  </section>
 
-    <h3>Повторяющаяся тьма</h3>
-    <p class="hint">Степень 1 — «бывает», степень 2 — «стало чертой». Тьма — не позор, а атом света (закон 24).</p>
-      <div class="dark-row">
-        <label for="dark-ur">Уретральный</label>
-        <select id="dark-ur">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-ko">Кожный</label>
-        <select id="dark-ko">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-an">Анальный</label>
-        <select id="dark-an">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-mu">Мышечный</label>
-        <select id="dark-mu">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-zr">Зрительный</label>
-        <select id="dark-zr">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-or">Оральный</label>
-        <select id="dark-or">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-ob">Обонятельный</label>
-        <select id="dark-ob">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
-      <div class="dark-row">
-        <label for="dark-zv">Звуковой</label>
-        <select id="dark-zv">
-          <option value="0" selected>нет</option>
-          <option value="1">бывает (степень 1)</option>
-          <option value="2">стало чертой (степень 2)</option>
-        </select>
-      </div>
+  <section id="v-light" style="display:none">
+    <h2>Свет-маршрут</h2>
+    <p id="lt-msg" class="big"></p>
+    <p>Раздел ПУТЬ: выбирайте дело, где свет растёт сам. Возвращайтесь, когда поток застынет.</p>
+    <button id="btn-light-ok" class="btn primary">Понятно</button>
+  </section>
 
-    <h3>Живущий свет</h3>
-    <p class="hint">Отметьте векторы, свет которых вы реально отдаёте людям, а не декларируете.</p>
-    <div class="light-grid">
-      <label class="light-cell"><input type="checkbox" id="light-ur"> Уретральный</label>
-      <label class="light-cell"><input type="checkbox" id="light-ko"> Кожный</label>
-      <label class="light-cell"><input type="checkbox" id="light-an"> Анальный</label>
-      <label class="light-cell"><input type="checkbox" id="light-mu"> Мышечный</label>
-      <label class="light-cell"><input type="checkbox" id="light-zr"> Зрительный</label>
-      <label class="light-cell"><input type="checkbox" id="light-or"> Оральный</label>
-      <label class="light-cell"><input type="checkbox" id="light-ob"> Обонятельный</label>
-      <label class="light-cell"><input type="checkbox" id="light-zv"> Звуковой</label>
-    </div>
-
-    <h3>Ведущий вектор</h3>
-    <select id="lead">
-      <option value="">— не указан —</option>
-        <option value="ur">Уретральный</option>
-        <option value="ko">Кожный</option>
-        <option value="an">Анальный</option>
-        <option value="mu">Мышечный</option>
-        <option value="zr">Зрительный</option>
-        <option value="or">Оральный</option>
-        <option value="ob">Обонятельный</option>
-        <option value="zv">Звуковой</option>
-    </select>
-
-    <h3>Тип отношений для ссылки</h3>
-    <select id="reltype">
-      <option value="partner" selected>Партнёр</option>
-      <option value="friend">Друг</option>
-      <option value="business">Бизнес</option>
-    </select>
-
-    <div class="btn-row">
-      <button id="btnCreate" class="primary" disabled>Создать ссылку</button>
-      <button id="btnMatch" class="primary" hidden disabled>Рассчитать совместимость</button>
-      <button id="btnBackHome">На главную</button>
-    </div>
-
-    <div id="linkBox" hidden>
-      <h3>Ссылка-приглашение</h3>
-      <p class="hint">Отправьте её второму человеку любым мессенджером. Профиль зашит в ссылку — не публикуйте её в открытых чатах.</p>
-      <input id="linkField" readonly>
-      <button id="btnCopy">Скопировать</button>
+  <section id="v-report" style="display:none">
+    <div id="rep-note" class="note" style="display:none"></div>
+    <div id="rep-card" class="card"></div>
+    <div id="rep-text" class="report"></div>
+    <div class="btnrow">
+      <button id="btn-share" class="btn primary">Ссылка для партнёра</button>
+      <button id="btn-match" class="btn">Матч с партнёром</button>
+      <button id="btn-circle" class="btn">Режим круга</button>
+      <button id="btn-restart" class="btn ghost">Пройти заново</button>
     </div>
   </section>
 
-  <!-- ЭКРАН 3: матч и результат -->
-  <section id="screenMatch" class="card" hidden>
+  <section id="v-share" style="display:none">
+    <h2>Ссылка для второго</h2>
+    <p id="share-msg"></p>
+    <p class="url" id="share-url"></p>
+    <button id="btn-copy" class="btn">Скопировать ссылку</button>
+    
+  </section>
+
+  <section id="v-match" style="display:none">
     <h2>Матч</h2>
-    <div id="partnerSummary"></div>
-    <div id="resultBox"></div>
+    <p>Вставьте код профиля партнёра или его ссылку (с ?q=). Свой профиль уже рассчитан из ваших ответов.</p>
+    <input id="match-input" class="inp" placeholder="v1:...:...:N или ссылка">
+    <p id="match-err" class="err"></p>
+    <button id="btn-match-go" class="btn primary">Считать матч</button>
+    <div id="match-scores" class="scores"></div>
+    <div id="match-f"></div>
+    
+  </section>
+
+  <section id="v-circle" style="display:none">
+    <h2>Круг</h2>
+    <p>По одному профилю в строке (или ссылок с ?q=). Свой профиль уже в списке.</p>
+    <textarea id="circle-input" class="inp" rows="4"></textarea>
+    <p id="circle-err" class="err"></p>
+    <button id="btn-circle-go" class="btn primary">Собрать круг</button>
+    <div id="circle-out"></div>
   </section>
 </main>
-
-<footer>
-  <p class="hint">Сервис работает полностью на вашей стороне: без сервера, без регистрации,
-  профиль переносится только внутри ссылки. Профиль — снимок (закон 14): он меняется вместе с уровнями.</p>
-</footer>
-
 <script src="compatibility_module.js"></script>
+<script src="anketa_module.js"></script>
 <script>
+'use strict';
 (function () {
-  'use strict';
-  var banner = document.getElementById('banner');
-  function showBanner(text, kind) {
-    banner.textContent = text;
-    banner.className = 'banner ' + kind;
+  var C = Anketa.CONFIG, ORDER = Anketa.ORDER, VN = {};
+  ORDER.forEach(function (v) { VN[v] = Anketa.VECTORS[v].name; });
+  var BLOCKS = { welcome: 'Старт', red: 'Скрининг', law2: 'Зона', vector: 'Карта', stage: 'Стадия' };
+  var answers = {}, idx = 0, routeNote = null, partnerCode = null, myProfile = null;
+  var DEMO = {"rz1": "Нет", "rz2": "Нет", "rz3": "Нет", "a1": "yes", "a2": "frozen", "a3": "years", "a4": "same", "my1": "rarely", "my2": "rarely", "ko1": "often", "ko2": "sometimes", "an1": "often", "an2": "often", "ur1": "sometimes", "ur2": "has", "ob1": "often", "ob2": "sometimes", "or1": "rarely", "or2": "normal", "zv1": "sometimes", "zv2": "rarely", "zr1": "sometimes", "zr2": "rarely", "zr3": "sometimes", "st1": "same", "st2": "same", "st3": "no", "st4": "was"};
+
+  function esc(s) { return String(s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); }
+  function md(t) {
+    return esc(t)
+      .replace(/^## (.+)$/gm, '<h3>$1</h3>')
+      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
   }
-  function fatal(msg) { showBanner('Ошибка страницы: ' + msg, 'bad'); }
-
-  window.addEventListener('error', function (e) { fatal(e.message || 'неизвестная ошибка скрипта'); });
-
-  function el(id) { return document.getElementById(id); }
-
-  function readProfileFromForm() {
-    var p = { v: {}, d: {}, l: [], ld: null };
-    var vecs = window.SVP ? SVP.VECTORS : [];
-    for (var i = 0; i < vecs.length; i++) {
-      var id = vecs[i].id;
-      p.v[id] = parseInt(el('lvl-' + id).value, 10) || 0;
-      var dv = parseInt(el('dark-' + id).value, 10) || 0;
-      if (dv > 0) p.d[id] = dv;
-      if (el('light-' + id).checked) p.l.push(id);
-    }
-    p.ld = el('lead').value || null;
-    return p;
+  function optVal(sc, i) {
+    var o = sc.options[i];
+    return typeof o === 'string' ? o : o.v;
   }
-  function fillFormFromProfile(p) {
-    var vecs = SVP.VECTORS;
-    for (var i = 0; i < vecs.length; i++) {
-      var id = vecs[i].id;
-      el('lvl-' + id).value = p.v[id] || 0;
-      el('out-' + id).textContent = String(p.v[id] || 0);
-      el('dark-' + id).value = String(p.d[id] || 0);
-      el('light-' + id).checked = (p.l || []).indexOf(id) !== -1;
-    }
-    el('lead').value = p.ld || '';
+  function optText(sc, i) {
+    var o = sc.options[i];
+    return typeof o === 'string' ? o : o.t;
   }
-
-  function profileSummary(p) {
-    var lines = [], vecs = SVP.VECTORS;
-    for (var i = 0; i < vecs.length; i++) {
-      var id = vecs[i].id, lv = p.v[id] || 0;
-      if (lv > 0) lines.push(vecs[i].name + ': ' + lv);
-    }
-    var extra = [];
-    for (i = 0; i < vecs.length; i++) {
-      var id2 = vecs[i].id;
-      if (p.d[id2] >= 1) extra.push('тьма: ' + vecs[i].name + ' (ст. ' + p.d[id2] + ')');
-    }
-    if (p.ld) extra.push('ведущий: ' + SVP.vecName(p.ld));
-    return '<b>Профиль приглашающего:</b> ' + lines.join(' · ') +
-      (extra.length ? '<br><span class="hint">' + extra.join(' · ') + '</span>' : '');
-  }
-
-  function renderResult(res) {
-    var html = '';
-    html += '<div class="score">Совместимость: <b>' + res.total + '%</b>';
-    html += ' <span class="hint">живой потолок для этого типа: ' + res.ceiling + '%</span></div>';
-    html += '<p class="verdict">' + res.verdict + '</p>';
-    if (res.layers && res.layers.length) {
-      html += '<h3>Слои</h3>';
-      for (var i = 0; i < res.layers.length; i++) {
-        var L = res.layers[i];
-        var pct = L.max ? Math.round(100 * L.got / L.max) : 0;
-        html += '<div class="layer"><div class="layer-name">' + L.name + ': ' + Math.round(L.got) +
-                '</div><div class="bar"><div class="bar-fill" style="width:' + pct + '%"></div></div></div>';
+  function branchHit(b) {
+    var w = b.when || {};
+    if (w.any_of) {
+      for (var i = 0; i < w.any_of.length; i++) {
+        var p = w.any_of[i].split('=');
+        if (answers[p[0]] === p[1]) return true;
       }
+      return false;
     }
-    if (res.flags && res.flags.length) {
-      html += '<h3>Флаги</h3><ul>';
-      for (i = 0; i < res.flags.length; i++) html += '<li class="flag">' + res.flags[i] + '</li>';
-      html += '</ul>';
+    if (w.tie) return false; // тай-брейк решает движок, интерфейс не ветвит
+    for (var k in w) { if (answers[k] !== w[k]) return false; }
+    return true;
+  }
+  function evalBranches() {
+    var list = C.branches || [];
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (branchHit(b)) return b;
     }
-    if (res.reports) {
-      html += '<h3>Что вам даёт партнёр</h3><ul>';
-      for (i = 0; i < res.reports.fromOther.length; i++) html += '<li>' + res.reports.fromOther[i] + '</li>';
-      html += '</ul><h3>Что вы даёте партнёру</h3><ul>';
-      for (i = 0; i < res.reports.toOther.length; i++) html += '<li>' + res.reports.toOther[i] + '</li>';
-      html += '</ul>';
-    }
-    el('resultBox').innerHTML = html;
+    return null;
   }
 
-  var partnerProfile = null;
-
-  function init() {
-    if (!window.SVP || !SVP.VERSION) { fatal('движок не загрузился — проверьте, что compatibility_module.js лежит рядом с match.html'); return; }
-    var res = SVP.runGolden();
-    var failed = [];
-    for (var i = 0; i < res.length; i++) if (!res[i].ok) failed.push(res[i].name + ' (' + res[i].got + '≠' + res[i].want + ')');
-    if (failed.length) { fatal('golden-тесты провалены: ' + failed.join('; ')); return; }
-    showBanner('Проверка движка: golden-тесты ' + res.length + '/' + res.length + ' пройдены — калибровка v' + SVP.VERSION + ' подтверждена', 'good');
-    el('btnStart').disabled = false;
-
-    var params = new URLSearchParams(location.search);
-    if (params.get('p')) {
-      try {
-        partnerProfile = SVP.decodeProfile(params.get('p'));
-        el('partnerSummary').innerHTML = profileSummary(partnerProfile);
-        el('screenHome').hidden = true;
-        el('screenForm').hidden = false;
-        el('screenMatch').hidden = false;
-        el('formTitle').textContent = 'Ваш профиль (второй участник)';
-        el('reltype').value = params.get('r') || 'partner';
-        el('btnCreate').hidden = true;
-        el('btnMatch').hidden = false;
-        el('btnMatch').disabled = false;
-        window.scrollTo(0, 0);
-      } catch (err) { fatal('не удалось прочитать профиль из ссылки: ' + err.message); }
-    }
+  // ---------- рендер ----------
+  var el = function (id) { return document.getElementById(id); };
+  function setProgress(stage) {
+    var segs = ['Скрининг', 'Зона', 'Карта', 'Стадия', 'Отчёт'];
+    var cur = segs.indexOf(stage);
+    el('progress').innerHTML = segs.map(function (s, i) {
+      return '<span class="seg' + (i <= cur ? ' on' : '') + '">' + s + '</span>';
+    }).join('<span class="arr">→</span>');
+  }
+  function show(id) {
+    ['welcome', 'question', 'redzone', 'light', 'report', 'share', 'match', 'circle'].forEach(function (v) {
+      el('v-' + v).style.display = v === id ? 'block' : 'none';
+    });
+    window.scrollTo(0, 0);
   }
 
-  document.addEventListener('DOMContentLoaded', init);
+  function renderWelcome() { show('welcome'); setProgress('Скрининг'); }
 
-  el('btnStart').addEventListener('click', function () {
-    el('screenHome').hidden = true;
-    el('screenForm').hidden = false;
-  });
-  el('btnBackHome').addEventListener('click', function () {
-    el('screenForm').hidden = true;
-    el('screenHome').hidden = false;
-  });
+  function renderQuestion() {
+    var sc = C.screens[idx];
+    show('question'); setProgress(sc.block === 'red' ? 'Скрининг' : sc.block === 'law2' ? 'Зона' : sc.block === 'vector' ? 'Карта' : 'Стадия');
+    el('q-block').textContent = BLOCKS[sc.block] || '';
+    el('q-text').textContent = sc.question;
+    el('q-hint').textContent = sc.hint || '';
+    el('q-hint').style.display = sc.hint ? 'block' : 'none';
+    var box = el('q-opts'); box.innerHTML = '';
+    sc.options.forEach(function (o, i) {
+      var btn = document.createElement('button');
+      btn.className = 'opt'; btn.type = 'button'; btn.textContent = optText(sc, i);
+      btn.onclick = function () { answer(sc, i, btn); };
+      box.appendChild(btn);
+    });
+    var acc = el('q-acc'), body = el('q-acc-body'), ex = (sc.help && sc.help.examples) || [];
+    body.innerHTML = '<h4>' + esc((sc.help && sc.help.title) || 'Как это выглядит в жизни') + '</h4>' +
+      ex.map(function (e) {
+        if (typeof e === 'string') return '<p>' + esc(e) + '</p>';
+        return '<p><strong>' + esc(e.case) + '</strong> → ' + esc(e.to) + '</p>';
+      }).join('') +
+      (sc.hint ? '<p class="acc-hint">' + esc(sc.hint) + '</p>' : '') +
+      '<p class="acc-foot">Отвечайте из текущего состояния, а не из «как правильно».</p>';
+    acc.style.display = 'none';
+    el('q-acc-btn').textContent = 'Как это выглядит в жизни?';
+    el('btn-back').style.display = idx > 0 ? 'inline-block' : 'none';
+  }
+  el('q-acc-btn').onclick = function () {
+    var acc = el('q-acc'), open = acc.style.display !== 'none';
+    acc.style.display = open ? 'none' : 'block';
+    el('q-acc-btn').textContent = open ? 'Как это выглядит в жизни?' : 'Свернуть';
+  };
+  el('btn-back').onclick = function () { if (idx > 0) { idx--; routeNote = null; renderQuestion(); } };
 
-  document.addEventListener('input', function (e) {
-    if (e.target && e.target.id && e.target.id.indexOf('lvl-') === 0) {
-      el(e.target.id.replace('lvl-', 'out-')).textContent = e.target.value;
+  function answer(sc, i) {
+    answers[sc.id] = optVal(sc, i);
+    var btns = el('q-opts').querySelectorAll('.opt');
+    btns[i].classList.add('picked');
+    setTimeout(function () {
+      var b = evalBranches();
+      if (b && b.stop) {
+        if (b.route === 'red_zone') { el('rz-msg').textContent = b.message; return show('redzone'); }
+        if (b.route === 'light') { el('lt-msg').textContent = b.message; return show('light'); }
+      }
+      if (b && !b.stop) routeNote = b;
+      idx++;
+      if (idx >= C.screens.length) return renderReport();
+      renderQuestion();
+    }, 400);
+  }
+
+  // ---------- отчёт ----------
+  function renderReport() {
+    setProgress('Отчёт');
+    myProfile = Anketa.deriveProfile(answers);
+    var rep = Anketa.buildReport(answers);
+    el('rep-text').innerHTML = mdReport(rep);
+    var code = Anketa.encodeProfile(myProfile);
+    var lead = VN[myProfile.leader] || '—';
+    el('rep-card').innerHTML =
+      '<h3>Ваша карта</h3><p>Ведущий: <strong>' + esc(lead) + '</strong></p><p>Профиль: <code>' + esc(code) + '</code></p>' +
+      '<p class="muted">Уровни 0–4 по векторам; свет — векторы уровня 3+ без тьмы.</p>';
+    if (routeNote && routeNote.message) el('rep-note').textContent = routeNote.message;
+    else if (partnerCode) el('rep-note').textContent = 'Вам прислали профиль — нажмите «Матч с партнёром», код уже подставлен.';
+    else el('rep-note').textContent = '';
+    show('report');
+  }
+  function mdReport(rep) {
+    if (typeof rep !== 'string') rep = rep && rep.text ? rep.text : String(rep);
+    var html = md(rep);
+    // чек-лист КУДА: строки, начинающиеся с "- ", внутри блока 5
+    var inBlock5 = false;
+    return html.split('\n').map(function (line) {
+      if (/5\.\s*КУДА/.test(line)) inBlock5 = true;
+      else if (/^\**\s*\d+\./.test(line)) inBlock5 = false;
+      if (inBlock5 && line.trim().slice(0, 2) === '- ') {
+        var item = esc(line.trim().slice(2).trim()).replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+        return '<label class="chk"><input type="checkbox" class="todo"> <span>' + item + '</span></label>';
+      }
+      return line;
+    }).join('\n');
+  }
+  el('btn-share').onclick = function () {
+    var code = Anketa.encodeProfile(myProfile);
+    var url = location.href.split('?')[0].split('#')[0] + '?q=' + encodeURIComponent(code);
+    el('share-url').textContent = url;
+    el('share-msg').textContent = 'Пришлите эту ссылку второму человеку. Он откроет её, пройдёт анкету — и оба увидят общий результат матча.';
+    show('share');
+  };
+  el('btn-copy').onclick = function () {
+    var t = el('share-url').textContent;
+    if (navigator.clipboard) navigator.clipboard.writeText(t);
+    el('btn-copy').textContent = 'Скопировано';
+    setTimeout(function () { el('btn-copy').textContent = 'Скопировать ссылку'; }, 1500);
+  };
+  el('btn-restart').onclick = function () { answers = {}; idx = 0; routeNote = null; partnerCode = null; renderWelcome(); };
+
+  // ---------- матч ----------
+  function parseCode(s) {
+    s = String(s || '').trim();
+    var m = s.match(/[?&]q=([^&\s]+)/);
+    if (m) s = decodeURIComponent(m[1]);
+    return Anketa.decodeProfile(s);
+  }
+  function scoreRow(label, val) { return '<div class="row"><span>' + label + '</span><strong>' + val + '</strong></div>'; }
+  function renderMatch(a, b) {
+    var mp = Anketa.match(a, b, 'partners'), mb = Anketa.match(a, b, 'business'), mf = Anketa.match(a, b, 'friends');
+    var html = '';
+    [ ['Партнёры', mp], ['Бизнес', mb], ['Друзья', mf] ].forEach(function (p) {
+      html += '<div class="scorecard"><div class="score-title">' + p[0] + '</div><div class="score">' + p[1].score + '</div><div class="score-sub">из 100</div></div>';
+    });
+    el('match-scores').innerHTML = html;
+    var f = mp.f;
+    if (mp.empty) {
+      el('match-f').innerHTML = '<p class="muted">' + esc(mp.note) + '</p>';
+    } else {
+      var doors = (f.doors || []).map(function (d) {
+        return '<li>тьма «' + esc(VN[d.dark]) + '» закрывается чистым светом «' + esc(VN[d.via]) + '» (из ' + esc(d.from) + ' в ' + esc(d.to) + ')</li>';
+      }).join('') || '<li class="muted">дверей нет</li>';
+      var same = (f.lightMatch || []).map(function (v) { return esc(VN[v]); }).join(', ') || '—';
+      el('match-f').innerHTML =
+        '<h4>Разбор</h4>' +
+        scoreRow('Совпадающий свет', same) +
+        scoreRow('Общая тьма', f.darkSame) +
+        scoreRow('Одинаковый руль', f.leaderSame ? 'да — борьба за ведение' : 'нет') +
+        scoreRow('Общие пики (уровень 4)', f.peaksSame) +
+        '<ul class="doors">' + doors + '</ul>';
     }
-  });
+    show('match');
+  }
+  el('btn-match').onclick = function () {
+    el('match-input').value = partnerCode ? partnerCode : el('match-input').value;
+    show('match');
+  };
+  el('btn-match-go').onclick = function () {
+    var b = parseCode(el('match-input').value);
+    if (!b) { el('match-err').textContent = 'Не удалось прочитать код профиля. Формат: v1:13313123:01101000:2 или ссылка с ?q='; return; }
+    el('match-err').textContent = '';
+    if (!myProfile) { el('match-err').textContent = 'Сначала пройдите анкету — своя карта ещё не рассчитана.'; return; }
+    renderMatch(myProfile, b);
+  };
 
-  el('btnCreate').addEventListener('click', function () {
-    var p = readProfileFromForm();
-    var type = el('reltype').value;
-    var link = location.origin + location.pathname + '?p=' + SVP.encodeProfile(p) + '&r=' + type;
-    el('linkField').value = link;
-    el('linkBox').hidden = false;
-  });
+  // ---------- круг ----------
+  el('btn-circle').onclick = function () {
+    var mine = myProfile ? Anketa.encodeProfile(myProfile) : '';
+    el('circle-input').value = el('circle-input').value || mine;
+    show('circle');
+  };
+  el('btn-circle-go').onclick = function () {
+    var lines = el('circle-input').value.split('\n').map(function (s) { return parseCode(s); }).filter(Boolean);
+    if (lines.length < 2) { el('circle-err').textContent = 'Нужно минимум два профиля (каждый с новой строки).'; return; }
+    el('circle-err').textContent = '';
+    lines.forEach(function (p, i) { if (!p.n) p.name = 'Участник ' + (i + 1); });
+    var c = Anketa.circle(lines);
+    var html = '<h4>Покрытие тьм: ' + c.coverage + '%</h4>';
+    html += '<h5>Матрица: кто чьи дефициты закрывает</h5><ul>' +
+      (c.matrix.length ? c.matrix.map(function (m) {
+        return '<li>тьма «' + esc(VN[m.dark]) + '» у ' + esc(m.who) + ' — закрывает свет «' + esc(VN[Anketa.VECTORS[m.dark].pair]) + '» у ' + esc(m.closedBy) + '</li>';
+      }).join('') : '<li class="muted">тьм не осталось — свет у всех</li>') + '</ul>';
+    html += '<h5>Непокрытые тьмы</h5><ul>' +
+      (c.uncovered.length ? c.uncovered.map(function (u) {
+        return '<li>у ' + esc(u.who) + ': тьма «' + esc(VN[u.dark]) + '» — нужен носитель света «' + esc(VN[u.missingLight]) + '»</li>';
+      }).join('') : '<li class="muted">все тьмы закрыты</li>') + '</ul>';
+    var dup = Object.keys(c.duplicates);
+    html += '<h5>Дубли (двое закрывают одно и то же)</h5><ul>' +
+      (dup.length ? dup.map(function (d) { return '<li>тьма «' + esc(VN[d]) + '»: ' + esc(c.duplicates[d].join(', ')) + '</li>'; }).join('') : '<li class="muted">нет</li>') + '</ul>';
+    var conf = Object.keys(c.conflicts);
+    html += '<h5>Конфликты руля</h5><ul>' +
+      (conf.length ? conf.map(function (k) { return '<li>ведущий «' + esc(VN[k]) + '»: ' + esc(c.conflicts[k].join(', ')) + '</li>'; }).join('') : '<li class="muted">нет</li>') + '</ul>';
+    el('circle-out').innerHTML = html;
+  };
 
-  el('btnCopy').addEventListener('click', function () {
-    el('linkField').select();
-    try { document.execCommand('copy'); showBanner('Ссылка скопирована', 'good'); } catch (e) {}
-  });
+  // ---------- красная зона / свет ----------
+  el('btn-call').onclick = function () { location.href = 'tel:+78002000122'; };
+  el('btn-rz-back').onclick = function () { idx = 0; renderWelcome(); };
+  el('btn-light-ok').onclick = function () { show('welcome'); };
 
-  el('btnMatch').addEventListener('click', function () {
-    if (!partnerProfile) return;
-    var mine = readProfileFromForm();
-    var type = el('reltype').value;
-    var res = SVP.calculate(mine, partnerProfile, type);
-    renderResult(res);
-    el('resultBox').scrollIntoView({ behavior: 'smooth' });
-  });
+  // ---------- демо и старт ----------
+  el('btn-demo').onclick = function () {
+    answers = {}; for (var k in DEMO) answers[k] = DEMO[k];
+    idx = C.screens.length; renderReport();
+  };
+  el('btn-start').onclick = function () { idx = 0; answers = {}; routeNote = null; renderQuestion(); };
+  el('btn-anketa-from-match').onclick = function () { idx = 0; answers = {}; renderQuestion(); };
+
+  // ---------- вход по ссылке ----------
+  var q = new URLSearchParams(location.search).get('q');
+  if (q) {
+    partnerCode = q;
+    var p = Anketa.decodeProfile(q);
+    el('invite-box').style.display = p ? 'block' : 'none';
+    if (p) el('invite-text').textContent = 'Вам прислали профиль. Пройдите анкету — и вы увидите совместимость: партнёры, бизнес, друзья.';
+    document.querySelector('.lead').style.display = p ? 'none' : 'block';
+  }
+
+  // ---------- самотест ----------
+  var st = Anketa.selfTest(), sc = SVP.selfTest();
+  if (!st.passed || !sc.passed) {
+    el('test-banner').style.display = 'block';
+    el('test-banner').textContent = 'Самотест не пройден: ' + (st.failed || []).concat(sc.failed || []).join('; ');
+  }
+  renderWelcome();
 })();
 </script>
 </body>
